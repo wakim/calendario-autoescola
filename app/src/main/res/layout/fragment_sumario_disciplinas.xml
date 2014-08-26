@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    
+    <ListView
+        android:id="@android:id/list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:divider="@null" />
+
+    <com.faizmalkani.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fd_fabbutton"
+        android:layout_width="@dimen/fab_size"
+        android:layout_height="@dimen/fab_size"
+        android:layout_gravity="bottom|right"
+        android:layout_marginBottom="@dimen/margin_bottom_fab"
+        android:layout_marginRight="@dimen/margin_right_fab"
+        app:drawable="@drawable/ic_add_fab_dark"
+        app:color="@color/fab" />
+
+</FrameLayout>

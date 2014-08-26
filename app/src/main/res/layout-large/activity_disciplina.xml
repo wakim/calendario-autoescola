@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".app.activity.DisciplinaActivity"
+    android:background="@color/grey_200">
+
+    <View
+        android:id="@+id/ad_top_background"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:background="@color/primary" />
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:animateLayoutChanges="true"
+        android:layout_marginStart="32dp"
+        android:layout_marginLeft="32dp"
+        android:layout_marginRight="32dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp">
+
+        <fragment
+            android:id="@+id/ad_main_fragment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/card_ui_background_light"
+            android:name="br.com.wakim.autoescola.calendario.app.fragment.FragmentDetalhesDisciplina"
+            tools:layout="@layout/fragment_detalhes_disciplina"
+            android:tag="@string/detalhes_disciplina_tag" />
+
+        <FrameLayout
+            android:id="@+id/ad_list_container"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@drawable/card_ui_background_light" />
+
+        <FrameLayout
+            android:id="@+id/ad_secondary_container"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/card_ui_background_light"
+            android:visibility="gone" />
+
+    </LinearLayout>
+</FrameLayout>

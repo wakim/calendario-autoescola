@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="disciplinas">
+        <item name="direcao_defensiva">
+            {
+                \"nome\": \"Direção Defensiva\",
+                \"limite\": 16,
+                \"cor\": \"#6a1b9a\",
+                \"simbolo\": \"DD\"
+            }
+        </item>
+        <item name="legislacao">
+            {
+                \"nome\": \"Legislação de Trânsito\",
+                \"limite\": 18,
+                \"cor\": \"#4e342e\",
+                \"simbolo\": \"LT\"
+            }
+        </item>
+        <item name="primeiros_socorros">
+            {
+                \"nome\": \"Primeiros Socorros\",
+                \"limite\": 4,
+                \"cor\": \"#c41411\",
+                \"simbolo\": \"PS\"
+            }
+        </item>
+        <item name="meio_ambiente">
+            {
+                \"nome\": \"Meio Ambiente\",
+                \"limite\": 4,
+                \"cor\": \"#056f00\",
+                \"simbolo\": \"MA\"
+            }
+        </item>
+        <item name="mecanica">
+            {
+                \"nome\": \"Mecânica Básica\",
+                \"limite\": 3,
+                \"cor\": \"#3b50ce\",
+                \"simbolo\": \"MB\"
+            }
+        </item>
+    </string-array>
+</resources>

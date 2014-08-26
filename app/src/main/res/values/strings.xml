@@ -1,0 +1,39 @@
+<resources>
+    <string name="app_name">Calendário Autoescola</string>
+    <string name="disciplinas">Disciplinas</string>
+    <string name="concluidas">Concluídas: %1$s</string>
+    <string name="restantes">Restantes: %1$s</string>
+
+    <string name="action_edit">Editar</string>
+    <string name="action_delete">Remover</string>
+    <string name="action_save">Salvar</string>
+    <string name="action_cancel">Cancelar</string>
+
+    <string name="nova_disciplina">Nova Disciplina</string>
+    <string name="editar_disciplina">Editar Disciplina</string>
+    <string name="nome_da_disciplina">Nome da disciplina*</string>
+    <string name="simbolo">Símbolo</string>
+    <string name="cor">Cor</string>
+    <string name="quantidade_de_aulas">Quantidade de aulas*</string>
+    <string name="cancelar_caps">CANCELAR</string>
+    <string name="voltar_caps">VOLTAR</string>
+    <string name="ok_caps">OK</string>
+
+    <string name="excluir_aula_title">Excluir Aula?</string>
+    <string name="excluir_aula_message">Esta aula já foi dada como concluída.\n\nDeseja continuar?</string>
+
+    <string name="excluir_disciplina_title">Excluir Disciplina?</string>
+    <string name="excluir_disciplina_com_presenca_message">Esta disciplina já possui aulas concluídas.\n\nDeseja continuar?</string>
+    <string name="excluir_disciplina_sem_presenca_message">Deseja excluir esta disciplina?</string>
+
+    <string name="sim_caps">SIM</string>
+    <string name="nao_caps">NÃO</string>
+
+    <string name="lista_disciplinas_vazia_1">Nenhuma Disciplina foi cadastrada.</string>
+    <string name="lista_disciplinas_vazia_2">Crie uma Disciplina para planejar suas aulas.</string>
+
+    <string name="lista_aulas_vazia_1">Nenhuma Aula foi cadastrada.</string>
+    <string name="lista_aulas_vazia_2">Inclua uma Aula para iniciar seu planejamento.</string>
+
+
+</resources>

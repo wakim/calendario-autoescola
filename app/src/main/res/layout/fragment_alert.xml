@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/card_ui_background_light">
+
+    <br.com.wakim.autoescola.calendario.app.view.RobotoTextView
+        android:id="@android:id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/Material.TextView.Title"
+        android:text="Titulo do diálogo"
+        android:layout_marginBottom="@dimen/margin_text"
+        android:paddingLeft="@dimen/margin_dialog_body"
+        android:paddingRight="@dimen/margin_dialog_body"
+        android:paddingTop="@dimen/margin_dialog_body"
+        app:typeface="regular" />
+
+    <ScrollView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="@dimen/margin_dialog_body"
+            android:paddingStart="@dimen/margin_dialog_body"
+            android:paddingRight="@dimen/margin_dialog_body"
+            android:paddingEnd="@dimen/margin_dialog_body">
+
+            <br.com.wakim.autoescola.calendario.app.view.RobotoTextView
+                android:id="@android:id/message"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/Material.Dialog.TextView.Body1"
+                android:layout_marginLeft="0dp"
+                android:layout_marginStart="0dp"
+                android:lineSpacingMultiplier="1.2"
+                android:text="Conteudo da mensagem de texto do dialogo\nQuebrando linha para testar\nQuebrando mais linha!"
+                app:typeface="regular" />
+        </LinearLayout>
+    </ScrollView>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/margin_dialog_bottom"
+        android:gravity="right"
+        android:weightSum="2">
+
+        <br.com.wakim.autoescola.calendario.app.view.RobotoTextView
+            android:id="@android:id/button2"
+            style="@style/Material.TextView.Button"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/height_text_button"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="@string/cancelar_caps"
+            app:typeface="medium" />
+
+        <br.com.wakim.autoescola.calendario.app.view.RobotoTextView
+            android:id="@android:id/button1"
+            style="@style/Material.TextView.Button"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/height_text_button"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:textColor="@color/dialog_confirm"
+            android:text="@string/ok_caps"
+            app:typeface="medium" />
+    </LinearLayout>
+</LinearLayout>

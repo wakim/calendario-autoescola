@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <View
+        android:id="@+id/fdd_spacer"
+        android:layout_width="match_parent"
+        android:layout_height="90dp"
+        android:background="@color/primary" />
+
+    <LinearLayout
+        android:id="@+id/fdd_header"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/margin_left_text_display"
+        android:layout_marginStart="@dimen/margin_left_text_display"
+        android:gravity="bottom">
+
+        <br.com.wakim.autoescola.calendario.app.view.RobotoTextView
+            android:id="@+id/fdd_nome_disciplina"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/Material.TextView.Display1"
+            android:layout_gravity="bottom"
+            android:text="Direção Defensiva"
+            android:ellipsize="end"
+            android:maxLines="3"
+            android:textColor="@color/white"
+            app:typeface="regular" />
+
+        <br.com.wakim.autoescola.calendario.app.view.RobotoTextView
+            android:id="@+id/fdd_simbolo_disciplina"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/Material.TextView.Body2"
+            android:layout_marginLeft="0dp"
+            android:layout_marginStart="0dp"
+            android:layout_marginRight="@dimen/margin_right_fab"
+            android:layout_marginEnd="@dimen/margin_right_fab"
+            android:layout_marginBottom="@dimen/half_margin_text"
+            android:layout_gravity="bottom"
+            android:text="DD"
+            android:textColor="@color/white"
+            app:typeface="medium" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/fdd_header_divider"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/fdd_spacer"
+        android:orientation="horizontal"
+        android:paddingTop="@dimen/margin_text"
+        android:paddingLeft="@dimen/margin_text"
+        android:paddingStart="@dimen/margin_text"
+        android:paddingRight="@dimen/margin_text"
+        android:paddingEnd="@dimen/margin_text"
+        android:paddingBottom="@dimen/margin_text"
+        android:background="@color/primary_600">
+
+        <br.com.wakim.autoescola.calendario.app.view.RobotoTextView
+            android:id="@+id/fdd_concluidas"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/Material.TextView.Body2"
+            android:text="Concluídas: 0"
+            android:gravity="end|right"
+            android:layout_marginLeft="0dp"
+            android:layout_marginStart="0dp"
+            android:textColor="@color/white"
+            app:typeface="medium" />
+
+        <br.com.wakim.autoescola.calendario.app.view.RobotoTextView
+            android:id="@+id/fdd_restantes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/Material.TextView.Body2"
+            android:text="Restantes: 0"
+            android:gravity="start|left"
+            android:textColor="@color/white"
+            app:typeface="medium" />
+    </LinearLayout>
+
+    <com.faizmalkani.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fdd_fab"
+        android:layout_width="@dimen/fab_size"
+        android:layout_height="@dimen/fab_size"
+        android:layout_marginRight="@dimen/margin_right_fab"
+        android:layout_marginEnd="@dimen/margin_right_fab"
+        android:layout_marginTop="@dimen/neg_half_fab_size"
+        android:layout_below="@id/fdd_header"
+        android:layout_alignParentRight="true"
+        app:drawable="@drawable/ic_add_fab_light"
+        app:color="@color/white" />
+
+</RelativeLayout>

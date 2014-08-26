@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="FloatingActionButton">
+        <attr name="drawable" format="integer"/>
+        <attr name="color" format="color"/>
+        <attr name="shadowRadius" format="float"/>
+        <attr name="shadowDx" format="float"/>
+        <attr name="shadowDy" format="float"/>
+        <attr name="shadowColor" format="integer"/>
+    </declare-styleable>
+
+    <declare-styleable name="RobotoTextView">
+        <attr name="typeface" format="string">
+            <enum name="regular" value="0" />
+            <enum name="medium" value="1" />
+            <enum name="light" value="2" />
+        </attr>
+    </declare-styleable>
+</resources>

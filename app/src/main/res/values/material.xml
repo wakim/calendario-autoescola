@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Material.TextView.Body1" parent="@android:style/TextAppearance.Medium">
+        <item name="android:textSize">@dimen/text_body1</item>
+        <item name="android:layout_marginLeft">@dimen/margin_text</item>
+        <item name="android:layout_marginStart">@dimen/margin_text</item>
+        <item name="android:textColor">@color/black_87p</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:typeface">sans</item>
+    </style>
+
+    <style name="Material.TextView.Body2" parent="@style/Material.TextView.Body1">
+        <item name="android:textSize">@dimen/text_body2</item>
+    </style>
+
+    <style name="Material.List.TextView.Primary" parent="@style/Material.TextView.Body1">
+        <item name="android:textSize">@dimen/text_list_primary</item>
+    </style>
+
+    <style name="Material.List.TextView.Secondary" parent="@style/Material.TextView.Body1">
+        <item name="android:textSize">@dimen/text_list_secondary</item>
+        <item name="android:textColor">@color/black_54p</item>
+    </style>
+
+    <style name="Material.Dialog.TextView.Body1" parent="@style/Material.TextView.Body1">
+        <item name="android:textSize">@dimen/text_dialog_body</item>
+    </style>
+
+    <style name="Material.Dialog.TextView.Body2" parent="@style/Material.TextView.Body2">
+        <item name="android:textColor">@color/black_54p</item>
+        <item name="android:textSize">@dimen/text_dialog_body</item>
+    </style>
+
+    <style name="Material.TextView.Headline" parent="@android:style/TextAppearance.Large">
+        <item name="android:textSize">@dimen/text_headline</item>
+        <item name="android:layout_marginLeft">@dimen/margin_left_text_headline</item>
+        <item name="android:layout_marginStart">@dimen/margin_left_text_headline</item>
+        <item name="android:textColor">@color/black_87p</item>
+    </style>
+
+    <style name="Material.EmptyView.TextView.Headline" parent="@style/Material.TextView.Headline">
+        <item name="android:layout_marginLeft">0dp</item>
+        <item name="android:layout_marginStart">0dp</item>
+        <item name="android:paddingLeft">8dp</item>
+        <item name="android:paddingStart">8dp</item>
+        <item name="android:paddingRight">8dp</item>
+        <item name="android:paddingEnd">8dp</item>
+    </style>
+
+    <style name="Material.TextView.Title" parent="@android:style/TextAppearance.Large">
+        <item name="android:textSize">@dimen/text_title</item>
+        <item name="android:textColor">@color/black_87p</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="Material.TextView.Display1" parent="@android:style/TextAppearance.Large">
+        <item name="android:textSize">@dimen/text_display1</item>
+        <item name="android:textColor">@color/black_54p</item>
+    </style>
+
+    <style name="Material.TextView.Display2" parent="@style/Material.TextView.Display1">
+        <item name="android:textSize">@dimen/text_display2</item>
+    </style>
+
+    <style name="Material.TextView.Display3" parent="@style/Material.TextView.Display1">
+        <item name="android:textSize">@dimen/text_display3</item>
+    </style>
+
+    <style name="Material.TextView.Button" parent="@android:style/TextAppearance.Medium">
+        <item name="android:textSize">@dimen/text_button</item>
+        <item name="android:textColor">@color/black_87p</item>
+        <item name="android:layout_height">@dimen/height_text_button</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:minWidth">@dimen/width_text_button</item>
+        <item name="android:minHeight">@dimen/height_text_button</item>
+        <item name="android:paddingLeft">@dimen/padding_text_button</item>
+        <item name="android:paddingRight">@dimen/padding_text_button</item>
+        <item name="android:background">@drawable/textview_button</item>
+    </style>
+</resources>

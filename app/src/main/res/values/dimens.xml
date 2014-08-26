@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="ab_height">56dp</dimen>
+
+    <dimen name="text_body1">16sp</dimen>
+    <dimen name="text_body2">16sp</dimen>
+    <dimen name="text_list_primary">18sp</dimen>
+    <dimen name="text_list_secondary">16sp</dimen>
+    <dimen name="text_title">22sp</dimen>
+    <dimen name="text_display1">34sp</dimen>
+    <dimen name="text_display2">45sp</dimen>
+    <dimen name="text_display3">54sp</dimen>
+    <dimen name="text_dialog_body">18sp</dimen>
+    <dimen name="text_headline">26sp</dimen>
+    <dimen name="text_button">16sp</dimen>
+
+    <dimen name="margin_dialog_body">24dp</dimen>
+    <dimen name="margin_dialog_bottom">16dp</dimen>
+    <dimen name="margin_dialog_content">16dp</dimen>
+    <dimen name="margin_text">16dp</dimen>
+    <dimen name="half_margin_text">8dp</dimen>
+    <dimen name="margin_list_icon">16dp</dimen>
+    <dimen name="margin_left_text_headline">72dp</dimen>
+    <dimen name="margin_left_text_display_with_icon">72dp</dimen>
+    <dimen name="margin_left_text_display">16dp</dimen>
+    <dimen name="margin_bottom_text_display">16dp</dimen>
+    <dimen name="margin_bottom_text_display_with_fab">36dp</dimen>
+    <dimen name="margin_top_text_body1">16dp</dimen>
+    <dimen name="margin_right_fab">16dp</dimen>
+    <dimen name="margin_bottom_fab">16dp</dimen>
+
+    <dimen name="padding_left_list_title">24dp</dimen>
+
+    <dimen name="height_two_line_item">36dp</dimen>
+    <dimen name="height_two_line">72dp</dimen>
+    <dimen name="height_text_button">36dp</dimen>
+    <dimen name="height_list_icon">40dp</dimen>
+    <dimen name="height_dialog_top_icon">56dp</dimen>
+
+    <dimen name="width_text_button">56dp</dimen>
+    <dimen name="width_list_icon">40dp</dimen>
+    <dimen name="width_dialog_top_icon">56dp</dimen>
+
+    <dimen name="padding_text_button">16dp</dimen>
+
+    <dimen name="color_round_size">56dp</dimen>
+
+    <dimen name="fab_size">64dp</dimen>
+    <dimen name="half_fab_size">64dp</dimen>
+    <dimen name="neg_half_fab_size">-32dp</dimen>
+
+    <dimen name="swipe_shadow">5dp</dimen>
+</resources>

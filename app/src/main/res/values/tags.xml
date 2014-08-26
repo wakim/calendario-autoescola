@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="sumario_disciplinas_tag">sumario_disciplinas</string>
+    <string name="edit_disciplina_tag">edit_disciplina</string>
+    <string name="ciplina_tag">edit_disciplina</string>
+    <string name="detalhes_disciplina_tag">detalhes_disciplina</string>
+    <string name="sumario_aulas_tag">sumario_aulas</string>
+    <string name="alert_dialog_tag">alert_dialog</string>
+    <string name="color_picker_dialog_tag">color_picker_dialog</string>
+    <string name="caldroid_fragment_tag">caldroid_fragment</string>
+</resources>
