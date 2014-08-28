@@ -37,20 +37,11 @@
             android:tag="@string/detalhes_disciplina_tag" />
 
         <FrameLayout
-            android:id="@+id/ad_list_container"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:background="@drawable/card_ui_background_light" />
-
-        <FrameLayout
             android:id="@+id/ad_secondary_container"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:layout_marginTop="16dp"
-            android:background="@drawable/card_ui_background_light"
-            android:visibility="gone" />
+            android:background="@drawable/card_ui_background_light" />
 
     </LinearLayout>
 </FrameLayout>

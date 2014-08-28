@@ -1,6 +1,6 @@
 package br.com.wakim.autoescola.calendario.app.activity;
 
-import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
@@ -14,14 +14,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 
-import com.roomorama.caldroid.CaldroidFragment;
-
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 
 import br.com.wakim.autoescola.calendario.R;
-import br.com.wakim.autoescola.calendario.app.fragment.CustomCaldroidFragment;
+import br.com.wakim.autoescola.calendario.app.fragment.CustomCalendarFragment;
 import br.com.wakim.autoescola.calendario.app.fragment.DetalhesDisciplinaCallback;
 import br.com.wakim.autoescola.calendario.app.fragment.FragmentDialogAlert;
 import br.com.wakim.autoescola.calendario.app.fragment.FragmentEditDisciplina;
@@ -36,13 +34,13 @@ import hirondelle.date4j.DateTime;
  * Created by wakim on 14/08/14.
  */
 public class DisciplinaActivity extends BaseActivity
-	implements FragmentEditDisciplina.DisciplinaCallback, DetalhesDisciplinaCallback, CustomCaldroidFragment.CalendarioCallback {
+	implements FragmentEditDisciplina.DisciplinaCallback, DetalhesDisciplinaCallback, CustomCalendarFragment.CalendarioCallback {
 
 	private static final String CALDROID_BUNDLE_KEY = "CALDROID_BUNDLE_KEY";
 
 	FragmentDetalhesDisciplina mDetalhesDisciplina;
 	FragmentSumarioAulas mSumarioAulas;
-	CustomCaldroidFragment mCaldroid;
+	CustomCalendarFragment mCaldroid;
 
 	Disciplina mDisciplina;
 
@@ -95,14 +93,13 @@ public class DisciplinaActivity extends BaseActivity
 
 		if(savedInstanceState == null) {
 			mSumarioAulas = new FragmentSumarioAulas(mDisciplina);
-
-			fm.beginTransaction().add(R.id.ad_container, mSumarioAulas, getString(R.string.sumario_aulas_tag)).commit();
+			fm.beginTransaction().add(R.id.ad_secondary_container, mSumarioAulas, getString(R.string.sumario_aulas_tag)).commit();
 		} else {
 			if(savedInstanceState.getBoolean(Params.PUSHED_TO_TOP, false)) {
 				setTitle(mDisciplina.getNome());
 			}
 
-			mCaldroid = (CustomCaldroidFragment) getSupportFragmentManager().findFragmentByTag(getString(R.string.caldroid_fragment_tag));
+			mCaldroid = (CustomCalendarFragment) getSupportFragmentManager().findFragmentByTag(getString(R.string.caldroid_fragment_tag));
 
 			if(mCaldroid != null) {
 				mCaldroid.getArguments().putAll(savedInstanceState.getBundle(CALDROID_BUNDLE_KEY));
@@ -204,6 +201,7 @@ public class DisciplinaActivity extends BaseActivity
 	@Override
 	public void onBackPressed() {
 		if(getDetalhesDisciplina().isPushedToTop()) {
+			getSupportFragmentManager().getBackStackEntryCount();
 			pushBackAndPopBackStack();
 			return;
 		}
@@ -306,9 +304,9 @@ public class DisciplinaActivity extends BaseActivity
 		return (FragmentEditDisciplina) getSupportFragmentManager().findFragmentByTag(getString(R.string.edit_disciplina_tag));
 	}
 
-	CustomCaldroidFragment getFragmentCalendario() {
+	CustomCalendarFragment getFragmentCalendario() {
 		if(mCaldroid == null) {
-			mCaldroid = (CustomCaldroidFragment) getSupportFragmentManager().findFragmentByTag(getString(R.string.caldroid_fragment_tag));
+			mCaldroid = (CustomCalendarFragment) getSupportFragmentManager().findFragmentByTag(getString(R.string.caldroid_fragment_tag));
 		}
 
 		return mCaldroid;
@@ -393,7 +391,7 @@ public class DisciplinaActivity extends BaseActivity
 			calendar = Calendar.getInstance();
 		}
 
-		mCaldroid = CustomCaldroidFragment.newInstance(null, calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.YEAR));
+		mCaldroid = CustomCalendarFragment.newInstance(null, calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.YEAR));
 
 		mCaldroid.setBackgroundResourceForDateTimes(highlightedDates);
 
@@ -419,13 +417,13 @@ public class DisciplinaActivity extends BaseActivity
 	void innerAddSecondaryFragment(Fragment newFragment, String tag) {
 		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 
-		if(mIsTablet) {
-			ft.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_right, R.anim.slide_in_right, R.anim.slide_out_right)
-			  .replace(R.id.ad_secondary_container, newFragment, tag);
+		if(mIsTablet && getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+			ft.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_right, R.anim.slide_in_right, R.anim.slide_out_right);
 		} else {
-			ft.setCustomAnimations(R.anim.slide_in_bottom, R.anim.slide_out_bottom, R.anim.slide_in_bottom, R.anim.slide_out_bottom)
-			  .replace(R.id.ad_container, newFragment, tag);
+			ft.setCustomAnimations(R.anim.slide_in_bottom, R.anim.slide_out_bottom, R.anim.slide_in_bottom, R.anim.slide_out_bottom);
 		}
+
+		ft.replace(R.id.ad_secondary_container, newFragment, tag);
 
 		ft.addToBackStack(null).commit();
 	}

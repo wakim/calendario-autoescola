@@ -137,6 +137,11 @@ public class FragmentSumarioAulas extends ListFragment implements LoaderManager.
 	void setListViewOffsetRight() {
 		float offset = mList.getWidth();
 
+		// Lista ainda nao foi carrega pelo Loader, entao nao foi medida.
+		if(offset == 0f) {
+			offset = ((View) mList.getParent()).getWidth();
+		}
+
 		// Desconta os dois icones
 		offset -= (getResources().getDimensionPixelSize(R.dimen.width_list_icon) * 2);
 		// Desconta as margins
@@ -216,6 +221,8 @@ public class FragmentSumarioAulas extends ListFragment implements LoaderManager.
 	void deleteAula() {
 		mAulaSelecionada.delete();
 		mAulaSelecionada = null;
+
+		// TODO Fazer isso assincronamente.
 
 		mDisciplina.saveAndCalculate();
 

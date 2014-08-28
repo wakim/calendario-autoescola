@@ -2,6 +2,7 @@ package br.com.wakim.autoescola.calendario.app.fragment;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -14,6 +15,7 @@ import com.roomorama.caldroid.CaldroidGridAdapter;
 import com.roomorama.caldroid.CaldroidListener;
 
 import java.util.Date;
+import java.util.HashMap;
 
 import br.com.wakim.autoescola.calendario.R;
 import br.com.wakim.autoescola.calendario.app.adapter.CustomCaldroidGridAdapter;
@@ -22,9 +24,12 @@ import hirondelle.date4j.DateTime;
 /**
  * Created by wakim on 25/08/14.
  */
-public class CustomCaldroidFragment extends CaldroidFragment {
+public class CustomCalendarFragment extends CaldroidFragment {
 
 	CalendarioCallback mCallback;
+
+	private static final String BACKGROUND_RESOURCE_FOR_DATETIMES = "BackgroundResourceForDateTimes";
+	private static final String TEXTCOLOR_RESOURCE_FOR_DATETIMES = "TextColorForDateTimes";
 
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
@@ -53,8 +58,8 @@ public class CustomCaldroidFragment extends CaldroidFragment {
 		return new CustomCaldroidGridAdapter(getActivity(), month, year, getCaldroidData(), extraData);
 	}
 
-	public static CustomCaldroidFragment newInstance(String dialogTitle, int month, int year) {
-		CustomCaldroidFragment f = new CustomCaldroidFragment();
+	public static CustomCalendarFragment newInstance(String dialogTitle, int month, int year) {
+		CustomCalendarFragment f = new CustomCalendarFragment();
 
 		// Supply num input as an argument.
 		Bundle args = new Bundle();
@@ -65,6 +70,35 @@ public class CustomCaldroidFragment extends CaldroidFragment {
 		f.setArguments(args);
 
 		return f;
+	}
+
+	@Override
+	public Bundle getSavedStates() {
+		Bundle savedState = super.getSavedStates();
+
+		savedState.putSerializable(BACKGROUND_RESOURCE_FOR_DATETIMES, this.backgroundForDateTimeMap);
+		savedState.putSerializable("TextColorForDateTimes", this.textColorForDateTimeMap);
+
+		return savedState;
+	}
+
+	@Override
+	protected void retrieveInitialArgs() {
+		super.retrieveInitialArgs();
+
+		Bundle arguments = getArguments();
+
+		if(arguments == null) {
+			return;
+		}
+
+		if(arguments.containsKey(BACKGROUND_RESOURCE_FOR_DATETIMES)) {
+			this.backgroundForDateTimeMap.putAll((HashMap<DateTime, Integer>) arguments.getSerializable(BACKGROUND_RESOURCE_FOR_DATETIMES));
+		}
+
+		if(arguments.containsKey(TEXTCOLOR_RESOURCE_FOR_DATETIMES)) {
+			this.textColorForDateTimeMap.putAll((HashMap<DateTime, Integer>) arguments.getSerializable(TEXTCOLOR_RESOURCE_FOR_DATETIMES));
+		}
 	}
 
 	@Override
@@ -113,6 +147,8 @@ public class CustomCaldroidFragment extends CaldroidFragment {
 
 		return super.onOptionsItemSelected(item);
 	}
+
+
 
 	public static interface CalendarioCallback {
 		public void onCalendarioAccept(Date date);
