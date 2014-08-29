@@ -36,7 +36,7 @@ import hirondelle.date4j.DateTime;
  * Created by wakim on 14/08/14.
  */
 public class DisciplinaActivity extends BaseActivity
-	implements FragmentEditDisciplina.DisciplinaCallback, DetalhesDisciplinaCallback, CustomCalendarFragment.CalendarioCallback {
+	implements FragmentEditDisciplina.DisciplinaCallback, DetalhesDisciplinaCallback {
 
 	FragmentDetalhesDisciplina mDetalhesDisciplina;
 	FragmentSumarioAulas mSumarioAulas;
@@ -315,16 +315,6 @@ public class DisciplinaActivity extends BaseActivity
 
 	@Override
 	public void onEditDisciplinaCancel() {
-		pushBackAndPopBackStack();
-	}
-
-	@Override
-	public void onCalendarioAccept(Date date) {
-		date.getTime();
-	}
-
-	@Override
-	public void onCalendarioCancel() {
 		pushBackAndPopBackStack();
 	}
 
