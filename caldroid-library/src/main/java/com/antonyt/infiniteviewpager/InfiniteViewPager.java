@@ -115,9 +115,7 @@ public class InfiniteViewPager extends ViewPager {
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-
 		/*
-
 		int rows = 0;
 
 		if(isInEditMode()) {

@@ -59,5 +59,4 @@
         <item name="android:popupMenuStyle">@style/PopupMenu.Ab</item>
         <item name="android:dropDownListViewStyle">@style/DropDownListView.Ab</item>
     </style>
-
 </resources>

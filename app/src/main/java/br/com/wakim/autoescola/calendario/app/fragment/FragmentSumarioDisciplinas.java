@@ -27,7 +27,6 @@ import br.com.wakim.autoescola.calendario.app.utils.Params;
  */
 public class FragmentSumarioDisciplinas extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor>, View.OnClickListener {
 
-	CursorLoader mLoader;
 	DisciplinasCursorAdapter mCursorAdapter;
 
 	SumarioDisciplinasCallback mCallback;
@@ -43,7 +42,6 @@ public class FragmentSumarioDisciplinas extends ListFragment implements LoaderMa
 	public void onDestroyView() {
 		super.onDestroyView();
 
-		mLoader = null;
 		mCursorAdapter = null;
 	}
 
@@ -81,7 +79,7 @@ public class FragmentSumarioDisciplinas extends ListFragment implements LoaderMa
 
 	@Override
 	public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-		mLoader = new CursorLoader(
+		return new CursorLoader(
 				getActivity(), // Parent activity context
 				ContentProvider.createUri(Disciplina.class, null), // Table to query
 				mCursorAdapter.getProjection(), // Projection to return
@@ -89,8 +87,6 @@ public class FragmentSumarioDisciplinas extends ListFragment implements LoaderMa
 				null, // No selection arguments
 				Disciplina.NOME + " ASC" // Default sort order
 		);
-
-		return mLoader;
 	}
 
 	@Override

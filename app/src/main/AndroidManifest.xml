@@ -24,5 +24,6 @@
         </activity>
 
         <activity android:name=".app.activity.DisciplinaActivity" android:theme="@style/AppTheme.OverlayedActionBar" />
+        <activity android:name=".app.activity.CalendarioAulasActivity" />
     </application>
 </manifest>

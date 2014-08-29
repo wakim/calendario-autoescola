@@ -1,5 +1,6 @@
 package br.com.wakim.autoescola.calendario.app.activity;
 
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -14,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 
+import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -36,11 +38,8 @@ import hirondelle.date4j.DateTime;
 public class DisciplinaActivity extends BaseActivity
 	implements FragmentEditDisciplina.DisciplinaCallback, DetalhesDisciplinaCallback, CustomCalendarFragment.CalendarioCallback {
 
-	private static final String CALDROID_BUNDLE_KEY = "CALDROID_BUNDLE_KEY";
-
 	FragmentDetalhesDisciplina mDetalhesDisciplina;
 	FragmentSumarioAulas mSumarioAulas;
-	CustomCalendarFragment mCaldroid;
 
 	Disciplina mDisciplina;
 
@@ -98,12 +97,6 @@ public class DisciplinaActivity extends BaseActivity
 			if(savedInstanceState.getBoolean(Params.PUSHED_TO_TOP, false)) {
 				setTitle(mDisciplina.getNome());
 			}
-
-			mCaldroid = (CustomCalendarFragment) getSupportFragmentManager().findFragmentByTag(getString(R.string.caldroid_fragment_tag));
-
-			if(mCaldroid != null) {
-				mCaldroid.getArguments().putAll(savedInstanceState.getBundle(CALDROID_BUNDLE_KEY));
-			}
 		}
 
 		fm.addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
@@ -126,6 +119,7 @@ public class DisciplinaActivity extends BaseActivity
 		return Color.HSVToColor(hsv);
 	}
 
+	/*
 	public int lightenColor(int color) {
 
 		int alpha = color >>> 24;
@@ -137,6 +131,7 @@ public class DisciplinaActivity extends BaseActivity
 
 		return (alpha << 24) | (r << 16) | (g << 8) | b;
 	}
+	*/
 
 	@Override
 	protected void configureStatusBarImmersive() {
@@ -216,18 +211,13 @@ public class DisciplinaActivity extends BaseActivity
 		if(getDetalhesDisciplina().isPushedToTop()) {
 			outState.putBoolean(Params.PUSHED_TO_TOP, true);
 		}
-
-		if(mCaldroid != null) {
-			mCaldroid.saveStatesToKey(outState, CALDROID_BUNDLE_KEY);
-		}
 	}
 
 	void checkMenu() {
 		Fragment frag1 = getFragmentEditDisciplina();
-		Fragment frag2 = getFragmentCalendario();
 
 		if(mMenu != null) {
-			applyMenuVisibility((frag1 == null || ! frag1.isVisible()) && (frag2 == null || ! frag2.isVisible()));
+			applyMenuVisibility(frag1 == null || ! frag1.isVisible());
 		}
 	}
 
@@ -304,14 +294,6 @@ public class DisciplinaActivity extends BaseActivity
 		return (FragmentEditDisciplina) getSupportFragmentManager().findFragmentByTag(getString(R.string.edit_disciplina_tag));
 	}
 
-	CustomCalendarFragment getFragmentCalendario() {
-		if(mCaldroid == null) {
-			mCaldroid = (CustomCalendarFragment) getSupportFragmentManager().findFragmentByTag(getString(R.string.caldroid_fragment_tag));
-		}
-
-		return mCaldroid;
-	}
-
 	@Override
 	public void onEditDisciplinaAccept(String nome, String simbolo, int cor, int limiteAulas) {
 		Integer previousColor = mDisciplina.getCor();
@@ -338,7 +320,7 @@ public class DisciplinaActivity extends BaseActivity
 
 	@Override
 	public void onCalendarioAccept(Date date) {
-		// TODO
+		date.getTime();
 	}
 
 	@Override
@@ -348,54 +330,26 @@ public class DisciplinaActivity extends BaseActivity
 
 	@Override
 	public void onNovaAula() {
-		showCalendarPicker(null);
+		goToCalendar(null);
 	}
 
 	@Override
 	public void onEditAula(Aula aula) {
-		showCalendarPicker(aula);
+		goToCalendar(aula.getDataAsCalendar());
 	}
 
-	void showCalendarPicker(final Aula aula) {
-		new AsyncTask<Void, Void, HashMap<DateTime, Integer>>() {
-
-			@Override
-			protected HashMap<DateTime, Integer> doInBackground(Void... params) {
-				return getHighlightedDates();
-			}
-
-			@Override
-			protected void onPostExecute(HashMap<DateTime, Integer> dates) {
-				super.onPostExecute(dates);
-
-				addCalendarPickerFragment(dates, aula == null ? null : aula.getDataAsCalendar());
-			}
-		}.execute();
-	}
-
-	HashMap<DateTime, Integer> getHighlightedDates() {
-		HashMap<DateTime, Integer> highlightedDates = new HashMap<DateTime, Integer>();
-		int cor = lightenColor(mDisciplina.getCor());
-
-		for(Aula aula : mDisciplina.getAulas()) {
-			Calendar data = aula.getDataAsCalendar();
-			highlightedDates.put(new DateTime(data.get(Calendar.YEAR), data.get(Calendar.MONTH) + 1, data.get(Calendar.DAY_OF_MONTH), 0, 0, 0, 0), cor);
-		}
-
-		return highlightedDates;
-	}
-
-	void addCalendarPickerFragment(HashMap<DateTime, Integer> highlightedDates, Calendar calendar) {
+	void goToCalendar(Calendar calendar) {
 
 		if(calendar == null) {
 			calendar = Calendar.getInstance();
 		}
 
-		mCaldroid = CustomCalendarFragment.newInstance(null, calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.YEAR));
+		Intent intent = new Intent(this, CalendarioAulasActivity.class);
 
-		mCaldroid.setBackgroundResourceForDateTimes(highlightedDates);
+		intent.putExtra(Params.CURRENT_DATE, (Serializable) calendar);
+		intent.putExtra(Params.DISCIPLINA, mDisciplina);
 
-		addSecondaryFragment(mCaldroid, getString(R.string.caldroid_fragment_tag), true);
+		startActivity(intent);
 	}
 
 	void addSecondaryFragment(final Fragment newFragment, final String tag, boolean pushingToTop) {

@@ -123,17 +123,6 @@ public class CustomCalendarFragment extends CaldroidFragment {
 	}
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		setHasOptionsMenu(true);
-		return super.onCreateView(inflater, container, savedInstanceState);
-	}
-
-	@Override
-	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		inflater.inflate(R.menu.calendario, menu);
-	}
-
-	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 
 		if(mCallback == null) {
