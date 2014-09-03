@@ -42,7 +42,6 @@
             android:layout_marginTop="16dp"
             android:layout_marginBottom="16dp"
             android:background="@drawable/card_ui_background_light"
-            android:layout_below="@id/am_main_fragment"
             android:visibility="gone" />
 
     </LinearLayout>

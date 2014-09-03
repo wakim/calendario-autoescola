@@ -123,6 +123,10 @@ public class DisciplinasCursorAdapter extends SimpleCursorAdapter {
 		return d;
 	}
 
+	public void destroy() {
+		mProjection = null;
+	}
+
 	public String[] getProjection() {
 		return mProjection;
 	}

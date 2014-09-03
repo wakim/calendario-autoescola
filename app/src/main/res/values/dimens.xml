@@ -28,11 +28,13 @@
     <dimen name="margin_top_text_body1">16dp</dimen>
     <dimen name="margin_right_fab">16dp</dimen>
     <dimen name="margin_bottom_fab">16dp</dimen>
+    <dimen name="margin_separator_with_list_icon_icon">56dp</dimen>
 
     <dimen name="padding_left_list_title">24dp</dimen>
 
     <dimen name="height_two_line_item">36dp</dimen>
     <dimen name="height_two_line">72dp</dimen>
+    <dimen name="height_one_line">56dp</dimen>
     <dimen name="height_text_button">36dp</dimen>
     <dimen name="height_list_icon">40dp</dimen>
     <dimen name="height_dialog_top_icon">56dp</dimen>

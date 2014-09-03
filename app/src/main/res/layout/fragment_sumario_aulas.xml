@@ -6,15 +6,10 @@
     android:layout_height="match_parent"
     android:background="@color/white">
 
-    <com.fortysevendeg.swipelistview.SwipeListView
-        xmlns:swipe="http://schemas.android.com/apk/res-auto"
+    <ListView
         android:id="@android:id/list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:divider="@null"
-        swipe:swipeFrontView="@+id/lia_front"
-        swipe:swipeBackView="@+id/lia_back"
-        swipe:swipeMode="right"
-        swipe:swipeOpenOnLongPress="false" />
+        android:divider="@null" />
 
 </FrameLayout>

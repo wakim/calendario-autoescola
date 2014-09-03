@@ -29,8 +29,6 @@ public class FragmentDialogColorPicker extends DialogFragment implements View.On
 	DialogListener mListener;
 	ColorPicker mPicker;
 
-	Integer mColor;
-
 	@NonNull
 	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -53,15 +51,6 @@ public class FragmentDialogColorPicker extends DialogFragment implements View.On
 	}
 
 	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-
-		if(savedInstanceState != null) {
-			mColor = savedInstanceState.getInt(Params.COLOR);
-		}
-	}
-
-	@Override
 	public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.fragment_color_picker, null);
 
@@ -73,22 +62,16 @@ public class FragmentDialogColorPicker extends DialogFragment implements View.On
 
 		mPicker = (ColorPicker) view.findViewById(R.id.color_picker);
 
-		if(mColor == null) {
-			mColor = getResources().getColor(R.color.primary);
+		if(savedInstanceState == null) {
+
+			int cor = getResources().getColor(R.color.primary);
+
+			cor = getArguments().getInt(Params.COLOR, cor);
+
+			configureColorPicker(view, cor);
 		}
 
-		mColor = getArguments().getInt(Params.COLOR, mColor);
-
-		configureColorPicker(view, mColor);
-
 		return view;
-	}
-
-	@Override
-	public void onSaveInstanceState(Bundle outState) {
-		super.onSaveInstanceState(outState);
-
-		outState.putInt(Params.COLOR, mPicker.getColor());
 	}
 
 	void configureColorPicker(View view, int color) {

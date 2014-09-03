@@ -13,118 +13,63 @@
     android:paddingEnd="@dimen/margin_dialog_body"
     android:paddingTop="@dimen/margin_dialog_body">
 
-    <br.com.wakim.autoescola.calendario.app.view.RobotoTextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        style="@style/Material.Dialog.TextView.Body1"
-        android:layout_marginLeft="0dp"
-        android:layout_marginStart="0dp"
-        android:text="@string/nome_da_disciplina"
-        app:typeface="regular" />
-
     <br.com.wakim.autoescola.calendario.app.view.RobotoEditText
         android:id="@+id/fnd_nome"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        style="@style/Material.TextView.Body2"
+        style="@style/Material.EditText.Body1"
         android:layout_marginLeft="0dp"
         android:layout_marginStart="0dp"
         android:hint="@string/nome_da_disciplina"
         app:typeface="medium" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
+    <br.com.wakim.autoescola.calendario.app.view.RobotoEditText
+        android:id="@+id/fnd_simbolo"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginTop="@dimen/margin_dialog_content"
-        android:weightSum="2">
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="match_parent"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
-
-            <br.com.wakim.autoescola.calendario.app.view.RobotoTextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                style="@style/Material.Dialog.TextView.Body1"
-                android:layout_marginLeft="0dp"
-                android:layout_marginStart="0dp"
-                android:text="@string/simbolo"
-                app:typeface="regular" />
-
-            <br.com.wakim.autoescola.calendario.app.view.RobotoEditText
-                android:id="@+id/fnd_simbolo"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                style="@style/Material.TextView.Body2"
-                android:hint="SI"
-                android:maxEms="6"
-                android:minEms="4"
-                android:maxLength="2"
-                app:typeface="medium" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginLeft="@dimen/margin_text"
-            android:layout_marginStart="@dimen/margin_text">
-
-            <br.com.wakim.autoescola.calendario.app.view.RobotoTextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                style="@style/Material.Dialog.TextView.Body1"
-                android:layout_marginLeft="0dp"
-                android:layout_marginStart="0dp"
-                android:layout_gravity="center_vertical"
-                android:text="@string/cor"
-                app:typeface="regular" />
-
-            <View
-                android:id="@+id/fnd_color"
-                android:layout_width="@dimen/color_round_size"
-                android:layout_height="@dimen/color_round_size"
-                android:background="@drawable/primary_color_state"
-                android:layout_marginLeft="@dimen/margin_text"
-                android:layout_marginStart="@dimen/margin_text"
-                android:clickable="true"
-                android:longClickable="true" />
-
-        </LinearLayout>
-    </LinearLayout>
+        style="@style/Material.EditText.Body1"
+        android:layout_marginLeft="0dp"
+        android:layout_marginStart="0dp"
+        android:hint="@string/simbolo"
+        android:minEms="6"
+        android:maxLength="2"
+        app:typeface="medium" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
         android:layout_marginTop="@dimen/margin_text"
-        android:layout_marginBottom="@dimen/margin_dialog_content">
+        android:orientation="horizontal">
 
         <br.com.wakim.autoescola.calendario.app.view.RobotoTextView
-            android:layout_width="wrap_content"
+            android:id="@+id/fnd_color"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             style="@style/Material.Dialog.TextView.Body1"
             android:layout_marginLeft="0dp"
             android:layout_marginStart="0dp"
-            android:text="@string/quantidade_de_aulas"
-            android:layout_gravity="center_vertical"
-            app:typeface="regular"/>
+            android:paddingBottom="@dimen/margin_text"
+            android:paddingTop="@dimen/margin_text"
+            android:gravity="center"
+            android:text="@string/selecione_uma_cor"
+            android:background="@drawable/primary_color_state"
+            android:textColor="@color/white"
+            app:typeface="regular" />
 
-        <br.com.wakim.autoescola.calendario.app.view.RobotoEditText
-            android:id="@+id/fnd_limite"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            style="@style/Material.TextView.Body2"
-            android:hint="5"
-            android:minEms="4"
-            android:maxLength="4"
-            android:inputType="number"
-            app:typeface="medium" />
     </LinearLayout>
+
+    <br.com.wakim.autoescola.calendario.app.view.RobotoEditText
+        android:id="@+id/fnd_limite"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/Material.EditText.Body1"
+        android:layout_marginTop="@dimen/margin_text"
+        android:layout_marginLeft="0dp"
+        android:layout_marginStart="0dp"
+        android:hint="@string/quantidade_de_aulas"
+        android:minEms="6"
+        android:maxLength="6"
+        android:inputType="number"
+        app:typeface="medium" />
+
 </LinearLayout>

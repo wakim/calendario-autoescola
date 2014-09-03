@@ -2,6 +2,7 @@
 
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:colorpicker="http://schemas.android.com/apk/res-auto"
     android:id="@+id/fcp_horizontal"
     android:orientation="horizontal"
     android:layout_width="wrap_content"
@@ -16,7 +17,7 @@
         android:layout_weight="1" />
 
     <LinearLayout
-        android:orientation="vertical"
+        android:orientation="horizontal"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
@@ -25,21 +26,25 @@
         <com.larswerkman.holocolorpicker.SVBar
             android:id="@+id/color_svbar"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            colorpicker:bar_orientation_horizontal="false" />
 
         <com.larswerkman.holocolorpicker.OpacityBar
             android:id="@+id/color_opacitybar"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            colorpicker:bar_orientation_horizontal="false" />
 
         <com.larswerkman.holocolorpicker.ValueBar
             android:id="@+id/color_valuebar"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            colorpicker:bar_orientation_horizontal="false" />
 
         <com.larswerkman.holocolorpicker.SaturationBar
             android:id="@+id/color_saturationbar"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            colorpicker:bar_orientation_horizontal="false" />
     </LinearLayout>
 </LinearLayout>

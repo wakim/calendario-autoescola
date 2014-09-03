@@ -42,6 +42,8 @@ public class FragmentSumarioDisciplinas extends ListFragment implements LoaderMa
 	public void onDestroyView() {
 		super.onDestroyView();
 
+		mCursorAdapter.destroy();
+
 		mCursorAdapter = null;
 	}
 

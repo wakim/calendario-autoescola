@@ -6,7 +6,8 @@ package br.com.wakim.autoescola.calendario.app.utils;
 public abstract class Params {
 
 	public static final int DISCIPLINA_LOADER_ID = 1,
-							AULAS_LOADER_ID = 2;
+							AULAS_LOADER_ID = 2,
+							AULAS_DIA_LOADER_ID = 3;
 
 	public static final String DISCIPLINA = "DISCIPLINA",
 							   COLOR_LAYOUT_VISIBLE = "COLOR_LAYOUT_VISIBLE",
@@ -14,8 +15,7 @@ public abstract class Params {
 							   COLOR = "COLOR",
 							   EDITING_DISCIPLINA = "EDITING_DISCIPLINA",
 							   CURRENT_DATE = "CURRENT_DATE",
-							   HIGHLIGHTED_DATES = "HIGHLIGHTED_DATES";
-
+							   GRID_MODE = "GRID_MODE";
 
 	public static final String DIALOG_TITLE = "DIALOG_TITLE",
 							   DIALOG_MESSAGE = "DIALOG_MESSAGE",

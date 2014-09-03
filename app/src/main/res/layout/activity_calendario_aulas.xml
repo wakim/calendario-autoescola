@@ -9,7 +9,7 @@
     tools:context=".app.activity.CalendarioAulasActivity">
 
     <FrameLayout
-        android:id="@+id/aca_primary_container"
+        android:id="@+id/aca_main_fragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 </LinearLayout>

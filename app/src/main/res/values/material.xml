@@ -9,7 +9,14 @@
         <item name="android:typeface">sans</item>
     </style>
 
+    <style name="Material.EditText.Body1" parent="@style/Material.TextView.Body1">
+    </style>
+
     <style name="Material.TextView.Body2" parent="@style/Material.TextView.Body1">
+        <item name="android:textSize">@dimen/text_body2</item>
+    </style>
+
+    <style name="Material.EditText.Body2" parent="@style/Material.EditText.Body1">
         <item name="android:textSize">@dimen/text_body2</item>
     </style>
 
@@ -26,7 +33,16 @@
         <item name="android:textSize">@dimen/text_dialog_body</item>
     </style>
 
+    <style name="Material.Dialog.EditText.Body1" parent="@style/Material.EditText.Body1">
+        <item name="android:textSize">@dimen/text_dialog_body</item>
+    </style>
+
     <style name="Material.Dialog.TextView.Body2" parent="@style/Material.TextView.Body2">
+        <item name="android:textColor">@color/black_54p</item>
+        <item name="android:textSize">@dimen/text_dialog_body</item>
+    </style>
+
+    <style name="Material.Dialog.EditText.Body2" parent="@style/Material.EditText.Body2">
         <item name="android:textColor">@color/black_54p</item>
         <item name="android:textSize">@dimen/text_dialog_body</item>
     </style>
@@ -36,6 +52,9 @@
         <item name="android:layout_marginLeft">@dimen/margin_left_text_headline</item>
         <item name="android:layout_marginStart">@dimen/margin_left_text_headline</item>
         <item name="android:textColor">@color/black_87p</item>
+    </style>
+
+    <style name="Material.EditText.Headline" parent="@style/Material.TextView.Headline">
     </style>
 
     <style name="Material.EmptyView.TextView.Headline" parent="@style/Material.TextView.Headline">
@@ -51,6 +70,9 @@
         <item name="android:textSize">@dimen/text_title</item>
         <item name="android:textColor">@color/black_87p</item>
         <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="Material.EditText.Title" parent="@style/Material.TextView.Title">
     </style>
 
     <style name="Material.TextView.Display1" parent="@android:style/TextAppearance.Large">
@@ -76,5 +98,12 @@
         <item name="android:paddingLeft">@dimen/padding_text_button</item>
         <item name="android:paddingRight">@dimen/padding_text_button</item>
         <item name="android:background">@drawable/textview_button</item>
+    </style>
+
+    <style name="Material.Spinner" parent="@style/Widget.AppCompat.Spinner.DropDown.ActionBar">
+        <item name="android:background">?android:selectableItemBackground</item>
+        <item name="android:dropDownSelector">?android:selectableItemBackground</item>
+        <item name="android:divider">@null</item>
+        <item name="android:dividerHeight">0dp</item>
     </style>
 </resources>

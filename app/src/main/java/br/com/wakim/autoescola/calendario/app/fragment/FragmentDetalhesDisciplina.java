@@ -1,10 +1,8 @@
 package br.com.wakim.autoescola.calendario.app.fragment;
 
 import android.app.Activity;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.text.Layout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,10 +13,10 @@ import com.nineoldandroids.animation.Animator;
 import com.nineoldandroids.animation.AnimatorListenerAdapter;
 import com.nineoldandroids.animation.AnimatorSet;
 import com.nineoldandroids.animation.ObjectAnimator;
-import com.nineoldandroids.view.ViewPropertyAnimator;
 
 import br.com.wakim.autoescola.calendario.R;
 import br.com.wakim.autoescola.calendario.app.model.Disciplina;
+import br.com.wakim.autoescola.calendario.app.utils.ColorHelper;
 import br.com.wakim.autoescola.calendario.app.utils.Params;
 
 /**
@@ -55,6 +53,17 @@ public class FragmentDetalhesDisciplina extends Fragment implements View.OnClick
 	}
 
 	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+
+		mDisciplina = getArguments() != null && getArguments().containsKey(Params.DISCIPLINA) ? getArguments().<Disciplina>getParcelable(Params.DISCIPLINA) : mDisciplina;
+
+		if(savedInstanceState != null) {
+			mDisciplina = savedInstanceState.<Disciplina>getParcelable(Params.DISCIPLINA);
+		}
+	}
+
+	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, final Bundle savedInstanceState) {
 		final View view = inflater.inflate(R.layout.fragment_detalhes_disciplina, null);
 
@@ -84,10 +93,6 @@ public class FragmentDetalhesDisciplina extends Fragment implements View.OnClick
 		mFab = view.findViewById(R.id.fdd_fab);
 
 		mFab.setOnClickListener(this);
-
-		if(savedInstanceState != null) {
-			mDisciplina = savedInstanceState.<Disciplina>getParcelable(Params.DISCIPLINA);
-		}
 
 		preencheDisciplinaSePossivel();
 
@@ -150,7 +155,7 @@ public class FragmentDetalhesDisciplina extends Fragment implements View.OnClick
 				int cor = mDisciplina.getCor();
 
 				mSpacer.setBackgroundColor(cor);
-				mHeaderDivider.setBackgroundColor(darkenColor(cor));
+				mHeaderDivider.setBackgroundColor(ColorHelper.darkenColor(cor));
 			}
 
 			mNomeDisciplina.setText(mDisciplina.getNome());
@@ -163,15 +168,6 @@ public class FragmentDetalhesDisciplina extends Fragment implements View.OnClick
 				mSimbolo.setVisibility(View.GONE);
 			}
 		}
-	}
-
-	public int darkenColor(int color) {
-		float[] hsv = new float[3];
-
-		Color.colorToHSV(color, hsv);
-		hsv[2] *= 0.8f;
-
-		return Color.HSVToColor(hsv);
 	}
 
 	public void setDisciplina(Disciplina disciplina) {

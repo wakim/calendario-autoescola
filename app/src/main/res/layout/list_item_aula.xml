@@ -1,88 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<FrameLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/white">
+    android:layout_height="@dimen/height_two_line"
+    android:gravity="center_vertical"
+    android:descendantFocusability="blocksDescendants">
 
-    <LinearLayout
-        android:id="@+id/lia_back"
-        android:orientation="vertical"
-        android:layout_width="wrap_content"
-        android:layout_height="@dimen/height_two_line"
-        android:descendantFocusability="blocksDescendants">
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/swipe_shadow"
-            android:background="@color/grey_300" />
-
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:gravity="center_vertical"
-            android:background="@color/grey_200">
-
-            <br.com.wakim.autoescola.calendario.app.view.DontPressWithParentImageView
-                android:id="@+id/lia_delete"
-                android:layout_width="@dimen/width_list_icon"
-                android:layout_height="@dimen/height_list_icon"
-                android:layout_marginLeft="@dimen/margin_list_icon"
-                android:layout_marginStart="@dimen/margin_list_icon"
-                android:scaleType="fitXY"
-                android:src="@drawable/ic_delete_light"
-                android:background="@drawable/imageview_button" />
-
-            <br.com.wakim.autoescola.calendario.app.view.DontPressWithParentImageView
-                android:id="@+id/lia_edit"
-                android:layout_width="@dimen/width_list_icon"
-                android:layout_height="@dimen/height_list_icon"
-                android:layout_marginLeft="@dimen/margin_list_icon"
-                android:layout_marginStart="@dimen/margin_list_icon"
-                android:scaleType="fitXY"
-                android:src="@drawable/ic_create_light"
-                android:background="@drawable/imageview_button" />
-
-            <View
-                android:layout_width="@dimen/swipe_shadow"
-                android:layout_height="match_parent"
-                android:background="@color/grey_300"
-                android:layout_marginLeft="@dimen/margin_list_icon"
-                android:layout_marginStart="@dimen/margin_list_icon" />
-        </LinearLayout>
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/lia_front"
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/height_two_line"
+    <br.com.wakim.autoescola.calendario.app.view.RobotoTextView
+        android:id="@+id/lia_data"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:layout_marginRight="@dimen/margin_text"
+        android:layout_marginEnd="@dimen/margin_text"
+        style="@style/Material.List.TextView.Primary"
         android:gravity="center_vertical"
-        android:background="@color/white">
+        android:layout_gravity="center_vertical"
+        android:text="dd/mm/YYYY hh:MM"
+        app:typeface="medium" />
 
-        <ImageView
-            android:id="@+id/lia_check"
-            android:layout_width="@dimen/width_list_icon"
-            android:layout_height="@dimen/height_list_icon"
-            android:layout_gravity="center_vertical"
-            android:layout_marginLeft="@dimen/margin_list_icon"
-            android:layout_marginStart="@dimen/margin_list_icon"
-            android:scaleType="fitXY"
-            android:src="@drawable/ic_check_circle_green_600" />
-
-        <br.com.wakim.autoescola.calendario.app.view.RobotoTextView
-            android:id="@+id/lia_data"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            style="@style/Material.List.TextView.Primary"
-            android:gravity="center_vertical"
-            android:layout_gravity="center_vertical"
-            android:text="dd/mm/YYYY hh:MM"
-            app:typeface="medium" />
-
-    </LinearLayout>
-</FrameLayout>
+    <ToggleButton
+        android:id="@+id/lia_check"
+        android:layout_width="@dimen/width_list_icon"
+        android:layout_height="@dimen/height_list_icon"
+        android:layout_gravity="center_vertical"
+        android:layout_marginRight="@dimen/margin_list_icon"
+        android:layout_marginStart="@dimen/margin_list_icon"
+        android:textOn="@null"
+        android:textOff="@null"
+        android:background="@drawable/custom_check_toggle" />
+</LinearLayout>

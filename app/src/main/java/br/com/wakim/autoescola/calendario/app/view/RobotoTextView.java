@@ -2,11 +2,9 @@ package br.com.wakim.autoescola.calendario.app.view;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.graphics.Typeface;
 import android.util.AttributeSet;
+import android.view.View;
 import android.widget.TextView;
-
-import java.util.WeakHashMap;
 
 import br.com.wakim.autoescola.calendario.R;
 import br.com.wakim.autoescola.calendario.app.utils.FontHelper;
@@ -42,5 +40,14 @@ public class RobotoTextView extends TextView {
 		}
 
 		a.recycle();
+	}
+
+	@Override
+	public void setPressed(boolean pressed) {
+		if (pressed && getParent() instanceof View && ((View) getParent()).isPressed()) {
+			return;
+		}
+
+		super.setPressed(pressed);
 	}
 }

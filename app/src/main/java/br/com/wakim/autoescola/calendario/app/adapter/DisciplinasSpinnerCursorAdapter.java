@@ -3,8 +3,6 @@ package br.com.wakim.autoescola.calendario.app.adapter;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Paint;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.OvalShape;
 import android.provider.BaseColumns;
@@ -31,7 +29,7 @@ public class DisciplinasSpinnerCursorAdapter extends SimpleCursorAdapter {
 	};
 
 	public DisciplinasSpinnerCursorAdapter(Context context) {
-		super(context, R.layout.disciplinas_spinner_item, null, new String[] {
+		super(context, R.layout.list_item_spinner_disciplina, null, new String[] {
 				BaseColumns._ID,
 				Disciplina.NOME,
 				Disciplina.COR,
@@ -67,14 +65,14 @@ public class DisciplinasSpinnerCursorAdapter extends SimpleCursorAdapter {
 	}
 
 	void bindView(View view, Context context, Cursor cursor, boolean isDropDown) {
-		Holder holder = (Holder) view.getTag(R.layout.disciplinas_spinner_item);
+		Holder holder = (Holder) view.getTag(R.layout.list_item_spinner_disciplina);
 
 		if(holder == null) {
 			holder = new Holder();
 
 			holder.text1 = (TextView) view.findViewById(android.R.id.text1);
 
-			view.setTag(R.layout.disciplinas_spinner_item, holder);
+			view.setTag(R.layout.list_item_spinner_disciplina, holder);
 		}
 
 		int nameIndex = cursor.getColumnIndex(Disciplina.NOME),
@@ -90,7 +88,6 @@ public class DisciplinasSpinnerCursorAdapter extends SimpleCursorAdapter {
 			setupColor(holder.text1, color);
 			holder.text1.setText(name + " - " + symbol);
 		} else {
-			holder.text1.setCompoundDrawables(null, null, null, null);
 			holder.text1.setTextColor(context.getResources().getColor(R.color.white));
 			holder.text1.setText(name);
 		}
@@ -137,6 +134,10 @@ public class DisciplinasSpinnerCursorAdapter extends SimpleCursorAdapter {
 		d.setSimbolo(symbol);
 
 		return d;
+	}
+
+	public void destroy() {
+		mProjection = null;
 	}
 
 	public String[] getProjection() {

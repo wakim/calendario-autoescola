@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="WeekCalendarView">
+        <attr name="startHour" format="integer" />
+        <attr name="endHour" format="integer" />
+        <attr name="font_size" format="dimension" />
+        <attr name="stripe_color" format="color" />
+        <attr name="line_color" format="color" />
+    </declare-styleable>
+
+    <declare-styleable name="WeekCalendarHeaderView">
+        <attr name="two_line_header" format="boolean" />
+        <attr name="abreviate_days" format="boolean" />
+    </declare-styleable>
+</resources>

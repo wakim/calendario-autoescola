@@ -11,13 +11,13 @@ import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
+import android.widget.ListView;
 
 import com.activeandroid.content.ContentProvider;
-import com.fortysevendeg.swipelistview.SwipeListView;
 
 import br.com.wakim.autoescola.calendario.R;
 import br.com.wakim.autoescola.calendario.app.adapter.AulasCursorAdapter;
+import br.com.wakim.autoescola.calendario.app.adapter.OnOptionClickListener;
 import br.com.wakim.autoescola.calendario.app.model.Aula;
 import br.com.wakim.autoescola.calendario.app.model.Disciplina;
 import br.com.wakim.autoescola.calendario.app.utils.Params;
@@ -26,12 +26,10 @@ import br.com.wakim.autoescola.calendario.app.utils.Params;
  * Created by wakim on 17/08/14.
  */
 public class FragmentSumarioAulas extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor>,
-	AulasCursorAdapter.OnSwipeOptionClickListener, FragmentDialogAlert.DialogListener {
+		OnOptionClickListener, FragmentDialogAlert.DialogListener {
 
 	CursorLoader mLoader;
 	AulasCursorAdapter mCursorAdapter;
-
-	SwipeListView mList;
 
 	Disciplina mDisciplina;
 	Aula mAulaSelecionada;
@@ -58,14 +56,17 @@ public class FragmentSumarioAulas extends ListFragment implements LoaderManager.
 	public void onDestroyView() {
 		super.onDestroyView();
 
+		mCursorAdapter.destroy();
+
 		mLoader = null;
 		mCursorAdapter = null;
-		mList = null;
 	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		mDisciplina = getArguments() != null && getArguments().containsKey(Params.DISCIPLINA) ? getArguments().<Disciplina>getParcelable(Params.DISCIPLINA) : mDisciplina;
 
 		if(savedInstanceState != null) {
 			mDisciplina = savedInstanceState.<Disciplina>getParcelable(Params.DISCIPLINA);
@@ -75,28 +76,19 @@ public class FragmentSumarioAulas extends ListFragment implements LoaderManager.
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		final View view = inflater.inflate(R.layout.fragment_sumario_aulas, null);
-		mList = (SwipeListView) view.findViewById(android.R.id.list);
+		ListView list = (ListView) view.findViewById(android.R.id.list);
 
 		mCursorAdapter = new AulasCursorAdapter(getActivity(), this);
 
 		setListAdapter(mCursorAdapter);
 
-		preencheDisciplinaSePossivel();
-
-		view.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
-			@Override
-			public boolean onPreDraw() {
-				view.getViewTreeObserver().removeOnPreDrawListener(this);
-				setListViewOffsetRight();
-
-				return true;
-			}
-		});
+		populateDisciplinaIfPossible();
 
 		View emptyView = inflater.inflate(R.layout.list_empty_aula, null);
 
 		((ViewGroup) view).addView(emptyView);
-		mList.setEmptyView(emptyView);
+
+		list.setEmptyView(emptyView);
 
 		return view;
 	}
@@ -124,8 +116,16 @@ public class FragmentSumarioAulas extends ListFragment implements LoaderManager.
 		outState.putParcelable(Params.DISCIPLINA, mDisciplina);
 	}
 
-	void preencheDisciplinaSePossivel() {
-		if(mDisciplina != null && mList != null) {
+	@Override
+	public void onListItemClick(ListView l, View v, int position, long id) {
+		if(mDetalhesCallback != null) {
+			Aula aula = mCursorAdapter.getAula(position);
+			mDetalhesCallback.onAulaClicked(aula);
+		}
+	}
+
+	void populateDisciplinaIfPossible() {
+		if(mDisciplina != null) {
 			if(mLoader == null) {
 				getLoaderManager().initLoader(Params.AULAS_LOADER_ID, null, this);
 			} else {
@@ -134,26 +134,9 @@ public class FragmentSumarioAulas extends ListFragment implements LoaderManager.
 		}
 	}
 
-	void setListViewOffsetRight() {
-		float offset = mList.getWidth();
-
-		// Lista ainda nao foi carrega pelo Loader, entao nao foi medida.
-		if(offset == 0f) {
-			offset = ((View) mList.getParent()).getWidth();
-		}
-
-		// Desconta os dois icones
-		offset -= (getResources().getDimensionPixelSize(R.dimen.width_list_icon) * 2);
-		// Desconta as margins
-		offset -= (getResources().getDimensionPixelSize(R.dimen.margin_list_icon) * 3);
-		offset -= getResources().getDimensionPixelSize(R.dimen.swipe_shadow);
-
-		mList.setOffsetRight(offset);
-	}
-
 	public void setDisciplina(Disciplina disciplina) {
 		mDisciplina = disciplina;
-		preencheDisciplinaSePossivel();
+		populateDisciplinaIfPossible();
 	}
 
 	@Override
@@ -191,22 +174,8 @@ public class FragmentSumarioAulas extends ListFragment implements LoaderManager.
 
 		mAulaSelecionada.setDisciplina(mDisciplina);
 
-		if(R.id.lia_delete == optionId) {
-			if (mAulaSelecionada.isConcluida()) {
-				FragmentDialogAlert alert =
-					new FragmentDialogAlert(getActivity(), R.string.excluir_aula_title, R.string.excluir_aula_message, R.string.sim_caps, R.string.nao_caps);
-
-				alert.setShowsDialog(true);
-				alert.setDialogListener(this);
-
-				alert.show(getChildFragmentManager(), getString(R.string.alert_dialog_tag));
-			} else {
-				deleteAula();
-			}
-		} else if(R.id.lia_edit == optionId) {
-			if(mDetalhesCallback != null) {
-				mDetalhesCallback.onEditAula(mAulaSelecionada);
-			}
+		if(R.id.lia_check == optionId) {
+			toggleConcludedAula();
 		}
 	}
 
@@ -219,16 +188,17 @@ public class FragmentSumarioAulas extends ListFragment implements LoaderManager.
 	}
 
 	void deleteAula() {
-		mAulaSelecionada.delete();
+		if(mDetalhesCallback != null) {
+			mDetalhesCallback.onAulaDeleted(mAulaSelecionada);
+		}
+
 		mAulaSelecionada = null;
+	}
 
-		// TODO Fazer isso assincronamente.
-
-		mDisciplina.saveAndCalculate();
-
-		preencheDisciplinaSePossivel();
-
-		mList.closeAnimate(mPosicaoAulaSelecionada);
+	void toggleConcludedAula() {
+		if(mDetalhesCallback != null) {
+			mDetalhesCallback.onAulaConcluidaToggle(mAulaSelecionada);
+		}
 	}
 
 	public void setDetalhesDisciplinaCallback(DetalhesDisciplinaCallback detalhesCallback) {

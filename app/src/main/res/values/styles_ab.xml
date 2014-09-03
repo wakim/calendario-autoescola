@@ -23,7 +23,7 @@
         <item name="actionBarItemBackground">@drawable/selectable_background_ab</item>
         <item name="popupMenuStyle">@style/PopupMenu.Ab</item>
         <item name="dropDownListViewStyle">@style/DropDownListView.Ab</item>
-        <item name="actionBarTabStyle">@style/ActionBarTabStyle.Ab</item>
+        <!-- <item name="actionBarTabStyle">@style/ActionBarTabStyle.Ab</item> -->
         <item name="actionDropDownStyle">@style/DropDownNav.Ab</item>
         <item name="actionBarStyle">@style/Theme.ActionBarStyle</item>
         <item name="actionModeBackground">@drawable/cab_background_top_ab</item>

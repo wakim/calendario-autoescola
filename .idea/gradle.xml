@@ -9,7 +9,9 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
-            <option value="$PROJECT_DIR$/caldroid-library" />
+            <option value="$PROJECT_DIR$/holocolorpicker" />
+            <option value="$PROJECT_DIR$/snackbar" />
+            <option value="$PROJECT_DIR$/weekcalendarview" />
           </set>
         </option>
       </GradleProjectSettings>

@@ -7,5 +7,7 @@
     <string name="sumario_aulas_tag">sumario_aulas</string>
     <string name="alert_dialog_tag">alert_dialog</string>
     <string name="color_picker_dialog_tag">color_picker_dialog</string>
-    <string name="caldroid_fragment_tag">caldroid_fragment</string>
+    <string name="sumario_aulas_dia_tag">sumario_aulas_dia</string>
+
+    <string name="child_swipe_tag">child_swipe</string>
 </resources>

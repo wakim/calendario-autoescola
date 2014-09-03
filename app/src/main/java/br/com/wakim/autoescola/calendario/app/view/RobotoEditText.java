@@ -2,12 +2,8 @@ package br.com.wakim.autoescola.calendario.app.view;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.graphics.Typeface;
 import android.util.AttributeSet;
 import android.widget.EditText;
-import android.widget.TextView;
-
-import java.util.WeakHashMap;
 
 import br.com.wakim.autoescola.calendario.R;
 import br.com.wakim.autoescola.calendario.app.utils.FontHelper;

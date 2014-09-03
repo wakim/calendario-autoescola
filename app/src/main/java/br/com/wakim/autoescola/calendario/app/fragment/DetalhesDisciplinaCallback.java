@@ -7,5 +7,7 @@ import br.com.wakim.autoescola.calendario.app.model.Aula;
  */
 public interface DetalhesDisciplinaCallback {
 	public void onNovaAula();
-	public void onEditAula(Aula aula);
+	public void onAulaClicked(Aula aula);
+	public void onAulaConcluidaToggle(Aula aula);
+	public void onAulaDeleted(Aula aula);
 }

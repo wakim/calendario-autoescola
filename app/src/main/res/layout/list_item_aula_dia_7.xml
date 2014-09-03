@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/height_one_line"
+    android:gravity="center_vertical"
+    android:descendantFocusability="blocksDescendants">
+
+    <br.com.wakim.autoescola.calendario.app.view.RobotoTextView
+        android:id="@+id/liad_hour"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/height_one_line"
+        style="@style/Material.List.TextView.Primary"
+        android:layout_marginLeft="0dp"
+        android:layout_marginStart="0dp"
+        android:paddingLeft="@dimen/margin_text"
+        android:paddingStart="@dimen/margin_text"
+        android:paddingRight="@dimen/margin_text"
+        android:paddingEnd="@dimen/margin_text"
+        android:background="@color/white"
+        android:gravity="center_vertical"
+        app:typeface="medium" />
+
+    <br.com.wakim.autoescola.calendario.app.view.RobotoTextView
+        android:id="@+id/liad_0"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/height_one_line"
+        android:layout_weight="1"
+        style="@style/Material.List.TextView.Primary"
+        android:textColor="@color/white"
+        android:gravity="center"
+        app:typeface="regular" />
+
+    <br.com.wakim.autoescola.calendario.app.view.RobotoTextView
+        android:id="@+id/liad_1"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/height_one_line"
+        android:layout_weight="1"
+        style="@style/Material.List.TextView.Primary"
+        android:textColor="@color/white"
+        android:gravity="center"
+        app:typeface="regular" />
+
+    <br.com.wakim.autoescola.calendario.app.view.RobotoTextView
+        android:id="@+id/liad_2"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/height_one_line"
+        android:layout_weight="1"
+        style="@style/Material.List.TextView.Primary"
+        android:textColor="@color/white"
+        android:gravity="center"
+        app:typeface="regular" />
+
+    <br.com.wakim.autoescola.calendario.app.view.RobotoTextView
+        android:id="@+id/liad_3"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/height_one_line"
+        android:layout_weight="1"
+        style="@style/Material.List.TextView.Primary"
+        android:textColor="@color/white"
+        android:gravity="center"
+        app:typeface="regular" />
+
+    <br.com.wakim.autoescola.calendario.app.view.RobotoTextView
+        android:id="@+id/liad_4"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/height_one_line"
+        android:layout_weight="1"
+        style="@style/Material.List.TextView.Primary"
+        android:textColor="@color/white"
+        android:gravity="center"
+        app:typeface="regular" />
+
+    <br.com.wakim.autoescola.calendario.app.view.RobotoTextView
+        android:id="@+id/liad_5"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/height_one_line"
+        android:layout_weight="1"
+        style="@style/Material.List.TextView.Primary"
+        android:textColor="@color/white"
+        android:gravity="center"
+        app:typeface="regular" />
+
+    <br.com.wakim.autoescola.calendario.app.view.RobotoTextView
+        android:id="@+id/liad_6"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/height_one_line"
+        android:layout_weight="1"
+        style="@style/Material.List.TextView.Primary"
+        android:textColor="@color/white"
+        android:gravity="center"
+        app:typeface="regular" />
+
+</LinearLayout>

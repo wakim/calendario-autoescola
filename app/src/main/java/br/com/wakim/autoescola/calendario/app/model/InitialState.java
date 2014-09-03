@@ -26,8 +26,6 @@ public abstract class InitialState {
 			for(String disciplina : context.getResources().getStringArray(R.array.disciplinas)) {
 				try {
 					persistDisciplina(disciplina);
-					persistDisciplina(disciplina);
-					persistDisciplina(disciplina);
 				} catch (JSONException e) {}
 			}
 		}

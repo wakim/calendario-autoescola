@@ -24,6 +24,7 @@ public class MainActivity extends BaseActivity
 		FragmentEditDisciplina.DisciplinaCallback {
 
 	FragmentEditDisciplina mEditDisciplina;
+	FragmentSumarioDisciplinas mSumarioDisciplinas;
 	ViewGroup mSecondaryContainer;
 
 	boolean mIsTablet = false;
@@ -41,10 +42,9 @@ public class MainActivity extends BaseActivity
 
 		if(savedInstanceState == null) {
 			FragmentSumarioDisciplinas sumarioDisciplinas = new FragmentSumarioDisciplinas();
-
 			fm.beginTransaction().add(R.id.am_main_fragment, sumarioDisciplinas).commit();
 		} else {
-			if(savedInstanceState.getBoolean(Params.EDITING_DISCIPLINA, false)) {
+			if(mSecondaryContainer != null && savedInstanceState.getBoolean(Params.EDITING_DISCIPLINA, false)) {
 				mSecondaryContainer.setVisibility(View.VISIBLE);
 			}
 		}
@@ -52,13 +52,18 @@ public class MainActivity extends BaseActivity
 		fm.addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
 			@Override
 			public void onBackStackChanged() {
-				FragmentEditDisciplina fragment = getEditDisciplina();
+				FragmentEditDisciplina editDisciplina = getEditDisciplina();
+				FragmentSumarioDisciplinas sumarioDisciplinas = getSumarioDisciplinas();
 
-				if(mSecondaryContainer != null && (fragment == null || ! fragment.isVisible())) {
+				if(mSecondaryContainer != null && (editDisciplina == null || ! editDisciplina.isVisible())) {
 					mSecondaryContainer.setVisibility(View.GONE);
 				}
 
-				mEditDisciplina = null;
+				if((sumarioDisciplinas == null || ! sumarioDisciplinas.isVisible()) && editDisciplina != null && editDisciplina.isVisible()) {
+					setTitle(R.string.nova_disciplina);
+				} else {
+					setTitle(R.string.disciplinas);
+				}
 			}
 		});
 
@@ -131,6 +136,14 @@ public class MainActivity extends BaseActivity
 		}
 
 		return mEditDisciplina;
+	}
+
+	FragmentSumarioDisciplinas getSumarioDisciplinas() {
+		if(mSumarioDisciplinas == null) {
+			mSumarioDisciplinas = (FragmentSumarioDisciplinas) getSupportFragmentManager().findFragmentByTag(getString(R.string.sumario_disciplinas_tag));
+		}
+
+		return mSumarioDisciplinas;
 	}
 
 	@Override

@@ -1,1 +1,1 @@
-include ':app', ':caldroid-library'
+include ':app', ':snackbar', ':holocolorpicker', ':weekcalendarview'

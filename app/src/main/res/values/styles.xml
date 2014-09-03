@@ -1,14 +1,17 @@
 <resources>
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.Ab">
+    <style name="AppTheme" parent="@style/Theme.Ab">
         <item name="android:homeAsUpIndicator">@drawable/ic_up_dark</item>
         <item name="homeAsUpIndicator">@drawable/ic_up_dark</item>
         <item name="android:windowContentOverlay">@null</item>
+
+        <item name="snackBarContainerStyle">@style/SnackBar.Container</item>
+        <item name="snackBarTextStyle">@style/SnackBar.Message</item>
+        <item name="snackBarButtonStyle">@style/SnackBar.Button</item>
     </style>
 
-    <style name="AppTheme.OverlayedActionBar" parent="AppTheme">
+    <style name="AppTheme.OverlayedActionBar" parent="@style/AppTheme">
         <item name="windowActionBarOverlay">true</item>
         <item name="android:windowActionBarOverlay">true</item>
     </style>
-
 </resources>

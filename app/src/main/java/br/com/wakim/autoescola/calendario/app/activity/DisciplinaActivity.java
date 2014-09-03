@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -15,22 +14,17 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 
-import java.io.Serializable;
 import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
 
 import br.com.wakim.autoescola.calendario.R;
-import br.com.wakim.autoescola.calendario.app.fragment.CustomCalendarFragment;
 import br.com.wakim.autoescola.calendario.app.fragment.DetalhesDisciplinaCallback;
+import br.com.wakim.autoescola.calendario.app.fragment.FragmentDetalhesDisciplina;
 import br.com.wakim.autoescola.calendario.app.fragment.FragmentDialogAlert;
 import br.com.wakim.autoescola.calendario.app.fragment.FragmentEditDisciplina;
-import br.com.wakim.autoescola.calendario.app.fragment.FragmentDetalhesDisciplina;
 import br.com.wakim.autoescola.calendario.app.fragment.FragmentSumarioAulas;
 import br.com.wakim.autoescola.calendario.app.model.Aula;
 import br.com.wakim.autoescola.calendario.app.model.Disciplina;
 import br.com.wakim.autoescola.calendario.app.utils.Params;
-import hirondelle.date4j.DateTime;
 
 /**
  * Created by wakim on 14/08/14.
@@ -92,7 +86,7 @@ public class DisciplinaActivity extends BaseActivity
 
 		if(savedInstanceState == null) {
 			mSumarioAulas = new FragmentSumarioAulas(mDisciplina);
-			fm.beginTransaction().add(R.id.ad_secondary_container, mSumarioAulas, getString(R.string.sumario_aulas_tag)).commit();
+			fm.beginTransaction().add(R.id.ad_secondary_fragment, mSumarioAulas, getString(R.string.sumario_aulas_tag)).commit();
 		} else {
 			if(savedInstanceState.getBoolean(Params.PUSHED_TO_TOP, false)) {
 				setTitle(mDisciplina.getNome());
@@ -324,8 +318,29 @@ public class DisciplinaActivity extends BaseActivity
 	}
 
 	@Override
-	public void onEditAula(Aula aula) {
+	public void onAulaClicked(Aula aula) {
 		goToCalendar(aula.getDataAsCalendar());
+	}
+
+	@Override
+	public void onAulaConcluidaToggle(Aula aula) {
+		// TODO Fazer isso assincronamente.
+		aula.setConcluida(! aula.isConcluida());
+		aula.save();
+
+		mDisciplina.saveAndCalculate();
+
+		getDetalhesDisciplina().setDisciplina(mDisciplina);
+	}
+
+	@Override
+	public void onAulaDeleted(Aula aula) {
+		// TODO Fazer isso assincronamente.
+		aula.delete();
+
+		mDisciplina.saveAndCalculate();
+
+		getDetalhesDisciplina().setDisciplina(mDisciplina);
 	}
 
 	void goToCalendar(Calendar calendar) {
@@ -336,7 +351,7 @@ public class DisciplinaActivity extends BaseActivity
 
 		Intent intent = new Intent(this, CalendarioAulasActivity.class);
 
-		intent.putExtra(Params.CURRENT_DATE, (Serializable) calendar);
+		intent.putExtra(Params.CURRENT_DATE, calendar);
 		intent.putExtra(Params.DISCIPLINA, mDisciplina);
 
 		startActivity(intent);
@@ -367,7 +382,7 @@ public class DisciplinaActivity extends BaseActivity
 			ft.setCustomAnimations(R.anim.slide_in_bottom, R.anim.slide_out_bottom, R.anim.slide_in_bottom, R.anim.slide_out_bottom);
 		}
 
-		ft.replace(R.id.ad_secondary_container, newFragment, tag);
+		ft.replace(R.id.ad_secondary_fragment, newFragment, tag);
 
 		ft.addToBackStack(null).commit();
 	}

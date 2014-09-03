@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingBottom="8dp"
+    android:paddingTop="8dp">
+
+    <br.com.wakim.autoescola.calendario.app.view.RobotoTextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        style="@style/Material.List.TextView.Primary"
+        android:layout_marginEnd="@dimen/margin_text"
+        android:layout_marginRight="@dimen/margin_text"
+        android:text="Dia"
+        app:typeface="medium" />
+
+    <br.com.wakim.autoescola.calendario.app.view.RobotoTextView
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        style="@style/Material.List.TextView.Secondary"
+        android:layout_marginLeft="0dp"
+        android:layout_marginStart="0dp"
+        android:layout_marginEnd="@dimen/margin_text"
+        android:layout_marginRight="@dimen/margin_text"
+        android:text="Setembro 1"
+        app:typeface="regular" />
+
+</LinearLayout>

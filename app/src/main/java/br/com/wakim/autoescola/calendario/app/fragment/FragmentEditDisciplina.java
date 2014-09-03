@@ -1,11 +1,6 @@
 package br.com.wakim.autoescola.calendario.app.fragment;
 
 import android.app.Activity;
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.DrawableContainer;
-import android.graphics.drawable.GradientDrawable;
-import android.graphics.drawable.StateListDrawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -17,8 +12,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 
+import com.mrengineer13.snackbar.SnackBar;
+
 import br.com.wakim.autoescola.calendario.R;
 import br.com.wakim.autoescola.calendario.app.model.Disciplina;
+import br.com.wakim.autoescola.calendario.app.utils.ColorHelper;
 import br.com.wakim.autoescola.calendario.app.utils.Params;
 
 /**
@@ -29,10 +27,14 @@ public class FragmentEditDisciplina extends Fragment implements View.OnClickList
 	DisciplinaCallback mCallback;
 	Disciplina mDisciplina;
 
+	Integer mCor;
+
 	EditText mName, mSymbol, mLimit;
 	View mColor;
 
 	ViewGroup mDataLayout;
+
+	SnackBar mSnackBar;
 
 	FragmentDialogColorPicker mColorPicker;
 
@@ -40,10 +42,13 @@ public class FragmentEditDisciplina extends Fragment implements View.OnClickList
 	public void onDestroyView() {
 		super.onDestroyView();
 
+		mSnackBar.destroy();
+
 		mName = mSymbol = mLimit = null;
 		mColor = null;
 		mDataLayout = null;
 		mColorPicker = null;
+		mSnackBar = null;
 	}
 
 	@Override
@@ -57,8 +62,12 @@ public class FragmentEditDisciplina extends Fragment implements View.OnClickList
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+		mDisciplina = getArguments() != null && getArguments().containsKey(Params.DISCIPLINA) ? getArguments().<Disciplina>getParcelable(Params.DISCIPLINA) : mDisciplina;
+
 		if(savedInstanceState != null) {
 			mDisciplina = savedInstanceState.<Disciplina>getParcelable(Params.DISCIPLINA);
+
+			mCor = savedInstanceState.getInt(Params.COLOR);
 		}
 	}
 
@@ -73,6 +82,8 @@ public class FragmentEditDisciplina extends Fragment implements View.OnClickList
 		if(isColorLayoutVisible()) {
 			outState.putBoolean(Params.COLOR_LAYOUT_VISIBLE, true);
 		}
+
+		outState.putInt(Params.COLOR, mCor);
 	}
 
 	@Override
@@ -90,26 +101,31 @@ public class FragmentEditDisciplina extends Fragment implements View.OnClickList
 
 		mColor.setOnClickListener(this);
 
+		if(mCor == null) {
+			if(mDisciplina != null) {
+				mCor = mDisciplina.getCor();
+			} else {
+				mCor = getResources().getColor(R.color.primary);
+			}
+		}
+
 		if(mDisciplina != null) {
 			mName.append(mDisciplina.getNome());
 			mSymbol.append(mDisciplina.getSimbolo());
 
-			if(mDisciplina.getLimite() != null) {
+			if (mDisciplina.getLimite() != null) {
 				mLimit.append(Integer.toString(mDisciplina.getLimite()));
 			}
-
-			if(mDisciplina.getCor() != null) {
-				configureColor(mDisciplina.getCor());
-			} else {
-				configureColor(getResources().getColor(R.color.primary));
-			}
-
-		} else {
-			configureColor(getResources().getColor(R.color.primary));
 		}
+
+		ColorHelper.configureColor(mColor, mCor);
+
+		mSnackBar = new SnackBar(getActivity());
 
 		return view;
 	}
+
+
 
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -130,7 +146,11 @@ public class FragmentEditDisciplina extends Fragment implements View.OnClickList
 			mCallback.onEditDisciplinaCancel();
 			return true;
 		} else if(id == R.id.ed_save) {
-			gatherData();
+			Integer message = gatherData();
+
+			if(message != null) {
+				mSnackBar.show(getString(message), SnackBar.MED_SNACK);
+			}
 		}
 
 		return super.onOptionsItemSelected(item);
@@ -138,47 +158,6 @@ public class FragmentEditDisciplina extends Fragment implements View.OnClickList
 
 	boolean isColorLayoutVisible() {
 		return mColorPicker != null && mColorPicker.isVisible();
-	}
-
-	void configureColor(int newColor) {
-
-		Drawable drawable = mColor.getBackground();
-
-		if(drawable instanceof GradientDrawable) {
-			GradientDrawable gDrawable = (GradientDrawable) drawable;
-			gDrawable.setColor(newColor);
-		} else if(drawable instanceof StateListDrawable) {
-			StateListDrawable listDrawable = (StateListDrawable) drawable;
-
-			DrawableContainer.DrawableContainerState drawableContainerState =
-					(DrawableContainer.DrawableContainerState) listDrawable.getConstantState();
-
-			int c = drawableContainerState.getChildCount();
-			Drawable[] children = drawableContainerState.getChildren();
-
-			for(int i = 0; i < c; ++i) {
-				GradientDrawable child = (GradientDrawable) children[i];
-				int[] states = child.getState();
-
-				// Esta invertido e nao sei porque.
-				if(states.length == 0) {
-					child.setColor(darkenColor(newColor));
-				} else {
-					child.setColor(newColor);
-				}
-			}
-		}
-
-		mColor.setTag(newColor);
-	}
-
-	public int darkenColor(int color) {
-		float[] hsv = new float[3];
-
-		Color.colorToHSV(color, hsv);
-		hsv[2] *= 0.8f;
-
-		return Color.HSVToColor(hsv);
 	}
 
 	@Override
@@ -192,7 +171,6 @@ public class FragmentEditDisciplina extends Fragment implements View.OnClickList
 
 	@Override
 	public void onClick(View v) {
-
 		int id = v.getId();
 
 		switch (id) {
@@ -202,37 +180,36 @@ public class FragmentEditDisciplina extends Fragment implements View.OnClickList
 		}
 	}
 
-	boolean gatherData() {
+	Integer gatherData() {
 		String name = mName.getText().toString();
 		String simbolo = mSymbol.getText().toString();
 		String sLimite = mLimit.getText().toString();
 
 		int limite;
-		int cor = (Integer) mColor.getTag();
 
 		if(name == null || name.trim().isEmpty()) {
-			return false;
+			return R.string.nome_vazio;
 		}
 
 		if(sLimite == null || sLimite.trim().isEmpty()) {
-			return false;
+			return R.string.limite_vazio;
 		}
 
 		try {
 			limite = Integer.parseInt(sLimite);
 		} catch(NumberFormatException e) {
-			return false;
+			return R.string.limite_vazio;
 		}
 
 		if(mCallback != null) {
-			mCallback.onEditDisciplinaAccept(name, simbolo, cor, limite);
+			mCallback.onEditDisciplinaAccept(name, simbolo, mCor, limite);
 		}
 
-		return true;
+		return null;
 	}
 
 	void openColorPickerDialog() {
-		mColorPicker = new FragmentDialogColorPicker((Integer) mColor.getTag());
+		mColorPicker = new FragmentDialogColorPicker(mCor);
 
 		mColorPicker.setShowsDialog(true);
 		mColorPicker.setCancelable(true);
@@ -250,7 +227,8 @@ public class FragmentEditDisciplina extends Fragment implements View.OnClickList
 
 	@Override
 	public void onConfirm(int cor) {
-		configureColor(cor);
+		mCor = cor;
+		ColorHelper.configureColor(mColor, mCor);
 	}
 
 	public static interface DisciplinaCallback {
