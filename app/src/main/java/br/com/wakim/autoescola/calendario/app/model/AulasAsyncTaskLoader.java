@@ -71,7 +71,7 @@ public class AulasAsyncTaskLoader extends AsyncTaskLoader<Map<DateTime, Event>> 
 	@Override
 	public void deliverResult(Map<DateTime, Event> data) {
 		if(isReset()) {
-			mData.clear();
+			releaseResources(data);
 			return;
 		}
 
@@ -107,22 +107,28 @@ public class AulasAsyncTaskLoader extends AsyncTaskLoader<Map<DateTime, Event>> 
 
 	@Override
 	public void stopLoading() {
+		// Attempt to cancel the current load task if possible.
 		cancelLoad();
 	}
 
 	@Override
 	public void onCanceled(Map<DateTime, Event> data) {
-		super.onCanceled(data);
-
 		releaseResources(data);
 	}
 
 	@Override
 	protected void onReset() {
+		super.onReset();
+
 		onStopLoading();
 
 		releaseResources(mData);
 		mData = null;
+	}
+
+	@Override
+	protected void onStopLoading() {
+		cancelLoad();
 	}
 
 	protected void releaseResources(Map<DateTime, Event> data) {

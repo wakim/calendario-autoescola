@@ -6,6 +6,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v4.view.GestureDetectorCompat;
 import android.text.TextPaint;
@@ -14,7 +15,10 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.TimeZone;
 
 import hirondelle.date4j.DateTime;
 
@@ -23,8 +27,8 @@ import hirondelle.date4j.DateTime;
  */
 public class WeekCalendarView extends View implements GestureDetector.OnGestureListener {
 
-	private static final int CELL_HEIGHT_MULTIPLIER = 5;
-	private static final float FIRST_CELL_WIDTH_MULTIPLIER = 1.5f;
+	static final int CELL_HEIGHT_MULTIPLIER = 5;
+	static final float FIRST_CELL_WIDTH_MULTIPLIER = 1.5f;
 
 	DateTime mHighlightedDate, mBaseDate, mStartDate, mEndDate;
 	Map<DateTime, Event> mEvents;
@@ -52,20 +56,20 @@ public class WeekCalendarView extends View implements GestureDetector.OnGestureL
 
 	WeekCalendarHeaderView mHeader;
 
-	private static final String START_HOUR = "START_HOUR",
+	private static final String PARENT_STATE = "WC_PARENT_STATE",
+								START_HOUR = "START_HOUR",
 								END_HOUR = "END_HOUR",
-								TWO_LINE_HEADER = "TWO_LINE_HEADER",
-								ABREVIATTED_DAYS = "ABREVIATTED_DAYS",
+								START_DATE = "START_DATE",
+								END_DATE = "END_DATE",
 								STRIPE_COLOR = "STRIPE_COLOR",
 								LINE_COLOR = "LINE_COLOR",
-								TEXT_SIZE = "TEXT_SIZE";
+								TEXT_SIZE = "TEXT_SIZE",
+								EVENTS = "EVENTS";
 
 
 	@Override
 	protected void onDetachedFromWindow() {
 		super.onDetachedFromWindow();
-
-		mEvents.clear();
 
 		mHoursPaint = mTextPaint = mStripePaint = null;
 		mEvents = null;
@@ -75,20 +79,63 @@ public class WeekCalendarView extends View implements GestureDetector.OnGestureL
 		mClickListener = null;
 		mLongClickListener = null;
 		mGestureDetector = null;
+
+		mHeader = null;
 	}
 
 	@Override
 	protected Parcelable onSaveInstanceState() {
-		return super.onSaveInstanceState();
+		Parcelable superState = super.onSaveInstanceState();
 
-		// TODO
+		Bundle state = new Bundle();
+		TimeZone tz = TimeZone.getDefault();
+
+		state.putParcelable(PARENT_STATE, superState);
+		state.putInt(START_HOUR, mStartHour);
+		state.putInt(END_HOUR, mEndHour);
+		state.putLong(START_DATE, mStartDate.getMilliseconds(tz));
+		state.putLong(END_DATE, mEndDate.getMilliseconds(tz));
+		state.putInt(STRIPE_COLOR, mStripePaint.getColor());
+		state.putInt(LINE_COLOR, mLinePaint.getColor());
+		state.putFloat(TEXT_SIZE, mHoursPaint.getTextSize());
+
+		state.putParcelableArrayList(EVENTS, new ArrayList<Event>(mEvents.values()));
+
+		return state;
 	}
 
 	@Override
 	protected void onRestoreInstanceState(Parcelable state) {
-		super.onRestoreInstanceState(state);
+		Bundle savedState = (Bundle) state;
 
-		// TODO
+		Parcelable superState = savedState.getParcelable(PARENT_STATE);
+		super.onRestoreInstanceState(superState);
+
+		TimeZone tz = TimeZone.getDefault();
+
+		mStartHour = savedState.getInt(START_HOUR);
+		mEndHour = savedState.getInt(END_HOUR);
+
+		mHoursCount = (mEndHour - mStartHour) + 1;
+
+		calculateDaysCount();
+
+		mStartDate = DateTime.forInstant(savedState.getLong(START_DATE), tz);
+		mEndDate = DateTime.forInstant(savedState.getLong(END_DATE), tz);
+
+		mStripePaint.setColor(savedState.getInt(STRIPE_COLOR));
+		mLinePaint.setColor(savedState.getInt(LINE_COLOR));
+
+		mHoursPaint.setTextSize(savedState.getFloat(TEXT_SIZE));
+		mTextPaint.setTextSize(mHoursPaint.getTextSize() * 0.75f);
+
+		ArrayList<Event> events = savedState.getParcelableArrayList(EVENTS);
+
+		mEvents = new HashMap<DateTime, Event>();
+
+		for(Event event : events) {
+			mEvents.put(event.getDate(), event);
+		}
 	}
 
 	public WeekCalendarView(Context context) {
@@ -124,14 +171,13 @@ public class WeekCalendarView extends View implements GestureDetector.OnGestureL
 			mTextPaint.setTextSize(textSize * 0.75f);
 			mHoursPaint.setTextSize(textSize);
 
-			mTextPaint.setTextAlign(Paint.Align.LEFT);
-			mHoursPaint.setTextAlign(Paint.Align.RIGHT);
-
-			mHoursPaint.setAntiAlias(true);
-			mTextPaint.setAntiAlias(true);
-
 			a.recycle();
 		}
+
+		mHoursPaint.setTextAlign(Paint.Align.RIGHT);
+
+		mHoursPaint.setAntiAlias(true);
+		mTextPaint.setAntiAlias(true);
 
 		mGestureDetector = new GestureDetectorCompat(context, this);
 
@@ -218,7 +264,7 @@ public class WeekCalendarView extends View implements GestureDetector.OnGestureL
 
 	void calculateCellSizes(float width, float height) {
 		mFirstCellWidth = (mHoursTextWidth * FIRST_CELL_WIDTH_MULTIPLIER);
-		mCellHeight = height / mHoursCount;//(mHoursCount + 1); // Deve considerar o header
+		mCellHeight = height / mHoursCount;
 		mCellWidth = (width - mFirstCellWidth) / getColumnsCount();
 	}
 
@@ -564,7 +610,7 @@ public class WeekCalendarView extends View implements GestureDetector.OnGestureL
 
 	public void clearEvents() {
 		if(mEvents != null) {
-			mEvents.clear();
+			mEvents = new HashMap<DateTime, Event>();
 		}
 	}
 

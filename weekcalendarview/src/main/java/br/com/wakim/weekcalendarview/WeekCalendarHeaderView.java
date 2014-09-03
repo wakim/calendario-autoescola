@@ -4,9 +4,15 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Typeface;
+import android.os.Build;
+import android.os.Bundle;
+import android.os.Parcelable;
 import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.view.View;
+
+import java.util.ArrayList;
+import java.util.TimeZone;
 
 import hirondelle.date4j.DateTime;
 
@@ -29,6 +35,48 @@ public class WeekCalendarHeaderView extends View {
 	Typeface mTypeface;
 
 	TextPaint mTextPaint = new TextPaint();
+
+	private static final String PARENT_STATE = "WC_PARENT_STATE",
+								TWO_LINE_HEADER = "TWO_LINE_HEADER",
+								ABREVIATTED_DAYS = "ABREVIATTED_DAYS",
+								DAYS = "DAYS",
+								TEXT_SIZE = "TEXT_SIZE",
+								START_DATE = "START_DATE";
+
+	@Override
+	protected Parcelable onSaveInstanceState() {
+		Parcelable superState = super.onSaveInstanceState();
+
+		Bundle state = new Bundle();
+		TimeZone tz = TimeZone.getDefault();
+
+		state.putParcelable(PARENT_STATE, superState);
+		state.putBoolean(TWO_LINE_HEADER, mTwoLineHeader);
+		state.putBoolean(ABREVIATTED_DAYS, mAbbreviateDays);
+		state.putInt(DAYS, mDays);
+		state.putLong(START_DATE, mStartDate.getMilliseconds(tz));
+		state.putFloat(TEXT_SIZE, mTextPaint.getTextSize());
+
+		return state;
+	}
+
+	@Override
+	protected void onRestoreInstanceState(Parcelable state) {
+		Bundle savedState = (Bundle) state;
+
+		Parcelable superState = savedState.getParcelable(PARENT_STATE);
+		super.onRestoreInstanceState(superState);
+
+		TimeZone tz = TimeZone.getDefault();
+
+		mTwoLineHeader = savedState.getBoolean(TWO_LINE_HEADER);
+		mAbbreviateDays = savedState.getBoolean(ABREVIATTED_DAYS);
+		mDays = savedState.getInt(DAYS);
+		mStartDate = DateTime.forInstant(savedState.getLong(START_DATE), tz);
+		mTextPaint.setTextSize(savedState.getFloat(TEXT_SIZE));
+
+		mDayLabels = getResources().getStringArray(mAbbreviateDays ? R.array.wc__abreviatted_days : R.array.wc__days);
+	}
 
 	@Override
 	protected void onDetachedFromWindow() {
@@ -71,6 +119,10 @@ public class WeekCalendarHeaderView extends View {
 			mTwoLineHeader = a.getBoolean(R.styleable.WeekCalendarHeaderView_two_line_header, true);
 			mAbbreviateDays = a.getBoolean(R.styleable.WeekCalendarHeaderView_abreviate_days, true);
 
+			int textSize = a.getDimensionPixelSize(R.styleable.WeekCalendarHeaderView_preferred_font_size, 14);
+
+			mTextPaint.setTextSize(textSize * 0.75f);
+
 			a.recycle();
 		}
 
@@ -81,7 +133,40 @@ public class WeekCalendarHeaderView extends View {
 
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-		setMeasuredDimension((int) (mOffsetX + (mCellWidth * (mDays + 1))), (int) mCellHeight);
+		if(mCellWidth != 0 && mCellHeight != 0 && mDays != 0) {
+			setMeasuredDimension((int) (mOffsetX + (mCellWidth * (mDays + 1))), (int) mCellHeight);
+			return;
+		}
+
+		int width, height;
+
+		int suggestedWidth = MeasureSpec.getSize(widthMeasureSpec);
+		int suggestedHeight = MeasureSpec.getSize(heightMeasureSpec);
+
+		int heightMode = MeasureSpec.getMode(heightMeasureSpec);
+
+		// Not matter, i want the maximum width
+		if(Build.VERSION.SDK_INT >= 16) {
+			width = Math.max(getMinimumWidth(), suggestedWidth);
+		} else {
+			width = suggestedWidth;
+		}
+
+		if(heightMode == MeasureSpec.EXACTLY || heightMode == MeasureSpec.AT_MOST) {
+			if(Build.VERSION.SDK_INT >= 16) {
+				height = Math.max(getMinimumHeight(), suggestedHeight);
+			} else {
+				height = suggestedHeight;
+			}
+		} else {
+			WidthHeight textBounds = TextHelper.measureText("MM", mTextPaint); // Mede o maior texto de duas letras
+
+			float hoursTextHeight = textBounds.height;
+
+			height = (int) (hoursTextHeight * WeekCalendarView.CELL_HEIGHT_MULTIPLIER);
+		}
+
+		setMeasuredDimension(width, height);
 	}
 
 	@Override
@@ -113,9 +198,9 @@ public class WeekCalendarHeaderView extends View {
 
 	String getHeaderString(DateTime date) {
 		return mDayLabels[date.getWeekDay() - 1]
-				.concat(mTwoLineHeader ? "\n" : " ")
-				.concat(date.getDay() < 10 ? "0" : "")
-				.concat(Integer.toString(date.getDay()));
+			.concat(mTwoLineHeader ? "\n" : " ")
+			.concat(date.getDay() < 10 ? "0" : "")
+			.concat(Integer.toString(date.getDay()));
 	}
 
 	void setStartDate(DateTime startDate) {

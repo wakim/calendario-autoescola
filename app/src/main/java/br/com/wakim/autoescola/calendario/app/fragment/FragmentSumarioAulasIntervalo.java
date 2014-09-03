@@ -137,6 +137,8 @@ public class FragmentSumarioAulasIntervalo extends Fragment implements LoaderMan
 
 	@Override
 	public void onLoadFinished(Loader<Map<DateTime, Event>> objectLoader, Map<DateTime, Event> data) {
+		mLoader = (AulasAsyncTaskLoader) objectLoader;
+
 		if(mWeekCalendarView != null) {
 			mWeekCalendarView.setEvents(data);
 		}
@@ -146,6 +148,7 @@ public class FragmentSumarioAulasIntervalo extends Fragment implements LoaderMan
 
 	@Override
 	public void onLoaderReset(Loader<Map<DateTime, Event>> objectLoader) {
+		mLoader = (AulasAsyncTaskLoader) objectLoader;
 		mWeekCalendarView.clearEvents();
 	}
 

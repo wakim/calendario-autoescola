@@ -1,6 +1,12 @@
 package br.com.wakim.autoescola.calendario.app.application;
 
+import android.util.Log;
+
 import com.activeandroid.ActiveAndroid;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import br.com.wakim.autoescola.calendario.app.model.InitialState;
 
