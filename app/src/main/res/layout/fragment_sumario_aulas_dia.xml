@@ -25,6 +25,7 @@
             android:layout_height="wrap_content"
             app:line_color="@color/black_87p"
             app:stripe_color="@color/grey_200"
-            app:font_size="16sp" />
+            app:font_size="16sp"
+            app:drag_enabled="true" />
     </ScrollView>
 </LinearLayout>

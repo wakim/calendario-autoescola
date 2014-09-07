@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.v4.app.DialogFragment;
+import android.text.Spanned;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -45,7 +46,7 @@ public class FragmentDialogAlert extends DialogFragment implements View.OnClickL
 		Bundle bundle = new Bundle();
 
 		bundle.putString(Params.DIALOG_TITLE, context.getResources().getString(titleResId));
-		bundle.putString(Params.DIALOG_MESSAGE, context.getResources().getString(messageResId));
+		bundle.putCharSequence(Params.DIALOG_MESSAGE, context.getResources().getString(messageResId));
 		bundle.putString(Params.DIALOG_BUTTON1, context.getResources().getString(button1ResId));
 		bundle.putString(Params.DIALOG_BUTTON2, context.getResources().getString(button2ResId));
 
@@ -56,7 +57,18 @@ public class FragmentDialogAlert extends DialogFragment implements View.OnClickL
 		Bundle bundle = new Bundle();
 
 		bundle.putString(Params.DIALOG_TITLE, title);
-		bundle.putString(Params.DIALOG_MESSAGE, message);
+		bundle.putCharSequence(Params.DIALOG_MESSAGE, message);
+		bundle.putString(Params.DIALOG_BUTTON1, button1);
+		bundle.putString(Params.DIALOG_BUTTON2, button2);
+
+		setArguments(bundle);
+	}
+
+	public FragmentDialogAlert(Context context, String title, Spanned message, String button1, String button2) {
+		Bundle bundle = new Bundle();
+
+		bundle.putString(Params.DIALOG_TITLE, title);
+		bundle.putCharSequence(Params.DIALOG_MESSAGE, message);
 		bundle.putString(Params.DIALOG_BUTTON1, button1);
 		bundle.putString(Params.DIALOG_BUTTON2, button2);
 
@@ -77,7 +89,7 @@ public class FragmentDialogAlert extends DialogFragment implements View.OnClickL
 		button2.setOnClickListener(this);
 
 		title.setText(getArguments().getString(Params.DIALOG_TITLE));
-		message.setText(getArguments().getString(Params.DIALOG_MESSAGE));
+		message.setText(getArguments().getCharSequence(Params.DIALOG_MESSAGE));
 
 		button1.setText(getArguments().getString(Params.DIALOG_BUTTON1));
 		button2.setText(getArguments().getString(Params.DIALOG_BUTTON2));

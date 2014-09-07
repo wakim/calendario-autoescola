@@ -59,7 +59,7 @@ public class AulasAsyncTaskLoader extends AsyncTaskLoader<Map<DateTime, Event>> 
 
 			DateTime dt = new DateTime(year, month, day, hour, 0, 0, 0);
 
-			aulas.put(dt, new DefaultEventImpl(dt, aula.getDisciplina().getSimbolo(), aula.getDisciplina().getCor()));
+			aulas.put(dt, new DefaultEventImpl(dt, aula.getDisciplina().getSimbolo(), aula.getDisciplina().getCor(), aula.getId(), aula.getDisciplina().getId(), aula.getDisciplina().getNome()));
 		}
 
 		return aulas;

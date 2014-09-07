@@ -19,8 +19,8 @@
         android:layout_height="match_parent"
         android:animateLayoutChanges="true">
 
-        <FrameLayout
-            android:id="@+id/aca_main_fragment"
+        <android.support.v4.view.ViewPager
+            android:id="@+id/aca_viewpager"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"

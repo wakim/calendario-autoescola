@@ -6,6 +6,7 @@
         <attr name="font_size" format="dimension" />
         <attr name="stripe_color" format="color" />
         <attr name="line_color" format="color" />
+        <attr name="drag_enabled" format="boolean" />
     </declare-styleable>
 
     <declare-styleable name="WeekCalendarHeaderView">

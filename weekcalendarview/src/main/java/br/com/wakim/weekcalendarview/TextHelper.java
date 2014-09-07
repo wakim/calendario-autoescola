@@ -6,10 +6,20 @@ import android.text.Layout;
 import android.text.StaticLayout;
 import android.text.TextPaint;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Created by wakim on 02/09/14.
  */
 public abstract class TextHelper {
+
+	static Map<String, Float> sSizeCache = new HashMap<String, Float>();
+
+	static String getCacheKey(String text, float cellWidth, float cellHeight) {
+		return text.concat("w").concat(Float.toString(cellWidth)).concat("h").concat(Float.toString(cellHeight));
+	}
+
 	static WidthHeight configureMaxTextSizeForBounds(String text, TextPaint textPaint, float width, float height) {
 		float textWidth = 0f, textHeight = 0f; // Our calculated text bounds
 		float textSize = textPaint.getTextSize();
@@ -58,4 +68,6 @@ public abstract class TextHelper {
 		staticLayout.draw(canvas);
 		canvas.restore();
 	}
+
+
 }

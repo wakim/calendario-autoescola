@@ -23,6 +23,9 @@
     <string name="excluir_aula_title">Excluir Aula?</string>
     <string name="excluir_aula_message">Esta aula já foi dada como concluída.\n\nDeseja continuar?</string>
 
+    <string name="substituir_aula_title">Substituir aula?</string>
+    <string name="substituir_aula_message"><![CDATA[Está alocando uma aula de <b>%1$s</b> em <b>%2$s</b> no lugar de <b>%3$s</b>.\n\nDeseja continuar?]]></string>
+
     <string name="excluir_disciplina_title">Excluir Disciplina?</string>
     <string name="excluir_disciplina_com_presenca_message">Esta disciplina já possui aulas concluídas.\n\nDeseja continuar?</string>
     <string name="excluir_disciplina_sem_presenca_message">Deseja excluir esta disciplina?</string>

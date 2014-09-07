@@ -64,9 +64,7 @@ public class AulasCursorAdapter extends SimpleCursorAdapter {
 
 			holder.data = (TextView) view.findViewById(R.id.lia_data);
 			holder.check = (ToggleButton) view.findViewById(R.id.lia_check);
-			//holder.delete = (ImageView) view.findViewById(R.id.lia_delete);
 
-			//holder.delete.setOnClickListener(mClickListener);
 			holder.check.setOnClickListener(mClickListener);
 
 			view.setTag(R.layout.list_item_disciplina, holder);

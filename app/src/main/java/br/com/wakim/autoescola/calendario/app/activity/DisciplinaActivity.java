@@ -24,6 +24,7 @@ import br.com.wakim.autoescola.calendario.app.fragment.FragmentEditDisciplina;
 import br.com.wakim.autoescola.calendario.app.fragment.FragmentSumarioAulas;
 import br.com.wakim.autoescola.calendario.app.model.Aula;
 import br.com.wakim.autoescola.calendario.app.model.Disciplina;
+import br.com.wakim.autoescola.calendario.app.utils.ColorHelper;
 import br.com.wakim.autoescola.calendario.app.utils.Params;
 
 /**
@@ -63,7 +64,7 @@ public class DisciplinaActivity extends BaseActivity
 		if(! mIsTablet) {
 			getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.transparent)));
 		} else {
-			getSupportActionBar().setBackgroundDrawable(new ColorDrawable(darkenColor(mDisciplina.getCor())));
+			getSupportActionBar().setBackgroundDrawable(new ColorDrawable(ColorHelper.darkenColor(mDisciplina.getCor())));
 		}
 
 		setTitle(null);
@@ -79,7 +80,7 @@ public class DisciplinaActivity extends BaseActivity
 		}
 
 		if(mTopBackground != null) {
-			mTopBackground.setBackgroundColor(darkenColor(mDisciplina.getCor()));
+			mTopBackground.setBackgroundColor(ColorHelper.darkenColor(mDisciplina.getCor()));
 		}
 
 		FragmentManager fm = getSupportFragmentManager();
@@ -103,29 +104,6 @@ public class DisciplinaActivity extends BaseActivity
 			}
 		});
 	}
-
-	public int darkenColor(int color) {
-		float[] hsv = new float[3];
-
-		Color.colorToHSV(color, hsv);
-		hsv[2] *= 0.8f;
-
-		return Color.HSVToColor(hsv);
-	}
-
-	/*
-	public int lightenColor(int color) {
-
-		int alpha = color >>> 24;
-		int r = (color >> 16) & 0xFF;
-		int g = (color >> 8) & 0xFF;
-		int b = color & 0xFF;
-
-		alpha *= 0.6f;
-
-		return (alpha << 24) | (r << 16) | (g << 8) | b;
-	}
-	*/
 
 	@Override
 	protected void configureStatusBarImmersive() {
@@ -155,7 +133,7 @@ public class DisciplinaActivity extends BaseActivity
 			return super.getStatusBarTintColor();
 		}
 
-		return mIsTablet ? darkenColor(mDisciplina.getCor()) : mDisciplina.getCor();
+		return ColorHelper.darkenColor(mDisciplina.getCor());
 	}
 
 	@Override

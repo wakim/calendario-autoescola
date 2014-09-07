@@ -5,19 +5,25 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.text.Html;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.text.DateFormat;
 import java.util.Date;
 import java.util.Map;
+import java.util.TimeZone;
 
 import br.com.wakim.autoescola.calendario.R;
 import br.com.wakim.autoescola.calendario.app.model.AulasAsyncTaskLoader;
+import br.com.wakim.autoescola.calendario.app.model.DefaultEventImpl;
 import br.com.wakim.autoescola.calendario.app.model.GridMode;
 import br.com.wakim.autoescola.calendario.app.utils.CalendarHelper;
 import br.com.wakim.autoescola.calendario.app.utils.FontHelper;
 import br.com.wakim.autoescola.calendario.app.utils.Params;
+import br.com.wakim.weekcalendarview.DropAction;
 import br.com.wakim.weekcalendarview.Event;
 import br.com.wakim.weekcalendarview.WeekCalendarHeaderView;
 import br.com.wakim.weekcalendarview.WeekCalendarView;
@@ -26,7 +32,8 @@ import hirondelle.date4j.DateTime;
 /**
  * Created by wakim on 17/08/14.
  */
-public class FragmentSumarioAulasIntervalo extends Fragment implements LoaderManager.LoaderCallbacks<Map<DateTime, Event>> {
+public class FragmentSumarioAulasIntervalo extends Fragment implements LoaderManager.LoaderCallbacks<Map<DateTime, Event>>,
+		WeekCalendarView.OnDragListener {
 
 	AulasAsyncTaskLoader mLoader;
 	DateTime mBaseDate;
@@ -36,6 +43,8 @@ public class FragmentSumarioAulasIntervalo extends Fragment implements LoaderMan
 
 	WeekCalendarHeaderView mWeekCalendarHeaderView;
 	WeekCalendarView mWeekCalendarView;
+
+	DateFormat mDateFormat = DateFormat.getDateTimeInstance();
 
 	public static FragmentSumarioAulasIntervalo newInstance(Date baseDate, GridMode mode) {
 		return newInstance(CalendarHelper.convertDateToDateTime(baseDate), mode);
@@ -96,6 +105,8 @@ public class FragmentSumarioAulasIntervalo extends Fragment implements LoaderMan
 		mWeekCalendarView.setTypeface(FontHelper.loadTypeface(getActivity(), 1));
 
 		mWeekCalendarView.setHeader(mWeekCalendarHeaderView);
+
+		mWeekCalendarView.setOnDragListener(this);
 
 		getLoaderManager().initLoader(Params.AULAS_DIA_LOADER_ID, null, this);
 
@@ -169,5 +180,55 @@ public class FragmentSumarioAulasIntervalo extends Fragment implements LoaderMan
 			mWeekCalendarView.setStartDate(mMode.getStartDate(mBaseDate));
 			mWeekCalendarView.setEndDate(mMode.getEndDate(mBaseDate));
 		}
+	}
+
+	@Override
+	public boolean onStartDrag(Event event) {
+		return true;
+	}
+
+	@Override
+	public boolean onStopDrag(Event event, DateTime date) {
+		return true;
+	}
+
+	@Override
+	public DropAction onStopDrag(Event draggedEvent, Event targetEvent) {
+		showDropDialog(draggedEvent, targetEvent, targetEvent.getDate());
+		return DropAction.WAIT;
+	}
+
+	void showDropDialog(final Event aulaSubstituta, final Event aulaAlvo, DateTime data) {
+		Date date = new Date(data.getMilliseconds(TimeZone.getDefault()));
+		String dataFormatada = mDateFormat.format(date);
+		String nomeAulaSubstituta = ((DefaultEventImpl) aulaSubstituta).getNomeDisciplina();
+		String nomeAulaAlvo = ((DefaultEventImpl) aulaAlvo).getNomeDisciplina();
+
+		String message = getString(R.string.substituir_aula_message, nomeAulaSubstituta, dataFormatada, nomeAulaAlvo);
+
+		FragmentDialogAlert alert = new FragmentDialogAlert(
+				getActivity(),
+				getString(R.string.substituir_aula_title),
+				Html.fromHtml(message),
+				getString(R.string.sim_caps),
+				getString(R.string.nao_caps)
+		);
+
+		alert.setDialogListener(new FragmentDialogAlert.DialogListener() {
+			@Override
+			public void onCancel() {
+				mWeekCalendarView.revertEventDrop(aulaSubstituta);
+			}
+
+			@Override
+			public void onConfirm() {
+				aulaSubstituta.setDate(aulaAlvo.getDate());
+				mWeekCalendarView.commitEventDrop(aulaSubstituta);
+			}
+		});
+
+		alert.setShowsDialog(true);
+		alert.setCancelable(true);
+		alert.show(getChildFragmentManager(), getString(R.string.alert_dialog_tag));
 	}
 }

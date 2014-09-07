@@ -19,18 +19,31 @@ public class DefaultEventImpl implements Event {
 	String symbol;
 	int color;
 
+	// Custom Data
+	long idAula;
+	long idDisciplina;
+	String nomeDisciplina;
+
 	public DefaultEventImpl() {}
 
-	public DefaultEventImpl(DateTime date, String symbol, int color) {
+	public DefaultEventImpl(DateTime date, String symbol, int color, long idAula, long idDisciplina, String nomeDisciplina) {
 		this.date = date;
 		this.symbol = symbol;
 		this.color = color;
+
+		this.idAula = idAula;
+		this.idDisciplina = idDisciplina;
+		this.nomeDisciplina = nomeDisciplina;
 	}
 
 	public DefaultEventImpl(Parcel in) {
 		date = DateTime.forInstantNanos(in.readLong(), TimeZone.getDefault());
 		symbol = in.readString();
 		color = in.readInt();
+
+		idAula = in.readLong();
+		idDisciplina = in.readLong();
+		nomeDisciplina = in.readString();
 	}
 
 	@Override
@@ -49,6 +62,23 @@ public class DefaultEventImpl implements Event {
 	}
 
 	@Override
+	public void setDate(DateTime date) {
+		this.date = date;
+	}
+
+	public long getIdAula() {
+		return idAula;
+	}
+
+	public long getIdDisciplina() {
+		return idDisciplina;
+	}
+
+	public String getNomeDisciplina() {
+		return nomeDisciplina;
+	}
+
+	@Override
 	public int describeContents() {
 		return 0;
 	}
@@ -58,6 +88,10 @@ public class DefaultEventImpl implements Event {
 		dest.writeLong(date.getMilliseconds(TimeZone.getDefault()));
 		dest.writeString(symbol);
 		dest.writeInt(color);
+
+		dest.writeLong(idAula);
+		dest.writeLong(idDisciplina);
+		dest.writeString(nomeDisciplina);
 	}
 
 	public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {

@@ -5,6 +5,7 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -41,7 +42,7 @@ public class CalendarioAulasActivity extends BaseActivity
 
 	GridModeSpinnerAdapter mAdapter;
 
-	FragmentSumarioAulasIntervalo mSumarioDia;
+	ViewPager mViewPager;
 
 	boolean mIsTablet = false;
 
@@ -49,7 +50,7 @@ public class CalendarioAulasActivity extends BaseActivity
 	protected void onDestroy() {
 		super.onDestroy();
 
-		mSumarioDia = null;
+		mViewPager = null;
 
 		mDisciplina = null;
 		mDate = null;
@@ -73,18 +74,23 @@ public class CalendarioAulasActivity extends BaseActivity
 
 			mDate = CalendarHelper.convertDateToDateTime(currentDate);
 
+			/*
 			mSumarioDia = FragmentSumarioAulasIntervalo.newInstance(mDate, mMode);
 
 			getSupportFragmentManager()
 				.beginTransaction()
 				.add(R.id.aca_main_fragment, mSumarioDia, getString(R.string.sumario_aulas_dia_tag))
 				.commit();
+			*/
 		} else {
 			Calendar currentDate = savedInstanceState.containsKey(Params.CURRENT_DATE) ? (Calendar) savedInstanceState.getSerializable(Params.CURRENT_DATE) : Calendar.getInstance();
 
 			mDisciplina = savedInstanceState.<Disciplina>getParcelable(Params.DISCIPLINA);
 			mDate = CalendarHelper.convertDateToDateTime(currentDate);
 		}
+
+		mViewPager = (ViewPager) findViewById(R.id.aca_viewpager);
+		// TODO
 
 		mAdapter = new GridModeSpinnerAdapter();
 
@@ -106,8 +112,7 @@ public class CalendarioAulasActivity extends BaseActivity
 
 			ft.replace(R.id.aca_secondary_fragment, newFragment, tag);
 		} else {
-			ft.setCustomAnimations(R.anim.slide_in_bottom, R.anim.slide_out_bottom, R.anim.slide_in_bottom, R.anim.slide_out_bottom)
-			  .replace(R.id.aca_main_fragment, newFragment, tag);
+			// TODO
 		}
 
 		ft.addToBackStack(null).commit();
@@ -123,14 +128,6 @@ public class CalendarioAulasActivity extends BaseActivity
 		}
 
 		return super.onOptionsItemSelected(item);
-	}
-
-	FragmentSumarioAulasIntervalo getSumarioDia() {
-		if(mSumarioDia == null) {
-			mSumarioDia = (FragmentSumarioAulasIntervalo) getSupportFragmentManager().findFragmentByTag(getString(R.string.sumario_aulas_dia_tag));
-		}
-
-		return mSumarioDia;
 	}
 
 	public void onAulaDismissed(Aula aula) {
@@ -152,11 +149,13 @@ public class CalendarioAulasActivity extends BaseActivity
 	public boolean onNavigationItemSelected(int i, long l) {
 		mMode = GridMode.values()[i];
 
+		/*
 		FragmentSumarioAulasIntervalo fragment = getSumarioDia();
 
 		if(fragment != null) {
 			fragment.changeMode(mMode);
 		}
+		*/
 
 		mAdapter.notifyDataSetChanged();
 
@@ -255,8 +254,10 @@ public class CalendarioAulasActivity extends BaseActivity
 				primary.setText(mMeses[indexMonth].concat(" ").concat(Integer.toString(mDate.getDay())).concat(", ").concat(Integer.toString(mDate.getYear())));
 				secondary.setText(secondaryText);
 			} else {
+				DateTime firstDayOfYear = new DateTime(mDate.getYear(), 1, 1, 0, 0, 0, 0);
+
 				primary.setText(mMeses[indexMonth].concat(" ").concat(Integer.toString(mDate.getYear())));
-				secondary.setText(getString(R.string.semana).concat(" ").concat(Integer.toString(mDate.getWeekIndex(mDate.getStartOfMonth()))));
+				secondary.setText(getString(R.string.semana).concat(" ").concat(Integer.toString(mDate.getWeekIndex(firstDayOfYear))));
 			}
 
 			return convertView;

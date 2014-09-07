@@ -11,4 +11,6 @@ public interface Event extends Parcelable {
 	public int getColor();
 	public String getSymbol();
 	public DateTime getDate();
+
+	public void setDate(DateTime date);
 }

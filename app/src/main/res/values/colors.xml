@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="primary">#259b24</color> <!-- Green 500 -->
-    <color name="status_bar">@color/primary</color> <!-- Green 500 -->
-    <!--<color name="status_bar">#0a7e07</color>--> <!-- Green 700 -->
+    <color name="status_bar">#0a7e07</color> <!-- Green 700 -->
     <color name="primary_600">#0a8f08</color> <!-- Green 600 -->
     <color name="primary_300">#42bd41</color>
 

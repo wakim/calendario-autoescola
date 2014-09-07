@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
@@ -11,9 +12,13 @@ import android.os.Parcelable;
 import android.support.v4.view.GestureDetectorCompat;
 import android.text.TextPaint;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.GestureDetector;
+import android.view.HapticFeedbackConstants;
 import android.view.MotionEvent;
+import android.view.SoundEffectConstants;
 import android.view.View;
+import android.view.accessibility.AccessibilityEvent;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,24 +30,28 @@ import hirondelle.date4j.DateTime;
 /**
  * Created by wakim on 01/09/14.
  */
-public class WeekCalendarView extends View implements GestureDetector.OnGestureListener {
+public class WeekCalendarView extends View implements GestureDetector.OnGestureListener, DraggableManager.OnDropAnimationListener {
 
 	static final int CELL_HEIGHT_MULTIPLIER = 5;
 	static final float FIRST_CELL_WIDTH_MULTIPLIER = 1.5f;
 
 	DateTime mHighlightedDate, mBaseDate, mStartDate, mEndDate;
+
 	Map<DateTime, Event> mEvents;
 
 	int mStartHour, mEndHour;
 	int mHoursCount = -1, mDayCount= - 1;
 
-	boolean inRequestLayout = false, mHeaderRequestedLayout = false;
+	boolean mInRequestLayout = false, mHeaderRequestedLayout = false;
+	boolean mDragEnabled = false;
+
+	boolean mIsDragging = false;
 
 	TextPaint mTextPaint = new TextPaint();
 	TextPaint mHoursPaint = new TextPaint();
-	TextPaint mStripePaint = new TextPaint();
 
-	Paint mLinePaint = new TextPaint();
+	Paint mStripePaint = new Paint();
+	Paint mLinePaint = new Paint();
 
 	float mHoursTextWidth, mHoursTextHeight;
 	float mFirstCellWidth, mCellWidth, mCellHeight;
@@ -51,8 +60,11 @@ public class WeekCalendarView extends View implements GestureDetector.OnGestureL
 
 	OnDateClickListener mClickListener;
 	OnDateLongClickListener mLongClickListener;
+	OnDragListener mDragListener;
 
 	GestureDetectorCompat mGestureDetector;
+
+	DraggableManager mDraggableManager = new DraggableManager();
 
 	WeekCalendarHeaderView mHeader;
 
@@ -71,16 +83,24 @@ public class WeekCalendarView extends View implements GestureDetector.OnGestureL
 	protected void onDetachedFromWindow() {
 		super.onDetachedFromWindow();
 
-		mHoursPaint = mTextPaint = mStripePaint = null;
+		TextHelper.sSizeCache.clear();
+		mDraggableManager.destroy();
+
+		mHoursPaint = mTextPaint = null;
+		mStripePaint = mLinePaint = null;
+
 		mEvents = null;
 		mHighlightedDate = mBaseDate = mStartDate = null;
 		mTypeFace = null;
 
 		mClickListener = null;
 		mLongClickListener = null;
+		mDragListener = null;
+
 		mGestureDetector = null;
 
 		mHeader = null;
+		mDraggableManager = null;
 	}
 
 	@Override
@@ -98,6 +118,12 @@ public class WeekCalendarView extends View implements GestureDetector.OnGestureL
 		state.putInt(STRIPE_COLOR, mStripePaint.getColor());
 		state.putInt(LINE_COLOR, mLinePaint.getColor());
 		state.putFloat(TEXT_SIZE, mHoursPaint.getTextSize());
+
+		Event e = mDraggableManager.popEvent();
+
+		if(e != null) {
+			mEvents.put(e.getDate(), e);
+		}
 
 		state.putParcelableArrayList(EVENTS, new ArrayList<Event>(mEvents.values()));
 
@@ -128,6 +154,8 @@ public class WeekCalendarView extends View implements GestureDetector.OnGestureL
 
 		mHoursPaint.setTextSize(savedState.getFloat(TEXT_SIZE));
 		mTextPaint.setTextSize(mHoursPaint.getTextSize() * 0.75f);
+
+		mDraggableManager.setTextSize(mTextPaint.getTextSize());
 
 		ArrayList<Event> events = savedState.getParcelableArrayList(EVENTS);
 
@@ -164,6 +192,8 @@ public class WeekCalendarView extends View implements GestureDetector.OnGestureL
 			mStripePaint.setColor(a.getColor(R.styleable.WeekCalendarView_stripe_color, 0xFFEEEEEE));
 			mLinePaint.setColor(a.getColor(R.styleable.WeekCalendarView_line_color, 0xFF000000));
 
+			mDragEnabled = a.getBoolean(R.styleable.WeekCalendarView_drag_enabled, false);
+
 			mHoursCount = (mEndHour - mStartHour) + 1;
 
 			float textSize = a.getDimensionPixelSize(R.styleable.WeekCalendarView_font_size, 14);
@@ -189,9 +219,13 @@ public class WeekCalendarView extends View implements GestureDetector.OnGestureL
 
 	@Override
 	public void requestLayout() {
-		inRequestLayout = true;
+		mInRequestLayout = true;
 		super.requestLayout();
-		inRequestLayout = false;
+		mInRequestLayout = false;
+	}
+
+	public void setDragEnabled(boolean dragEnabled) {
+		mDragEnabled = dragEnabled;
 	}
 
 	public void setBaseDate(DateTime baseDate) {
@@ -253,6 +287,27 @@ public class WeekCalendarView extends View implements GestureDetector.OnGestureL
 		configureHeaderValues();
 	}
 
+	@Override
+	protected void onAttachedToWindow() {
+		super.onAttachedToWindow();
+
+		setHapticFeedbackEnabled(true);
+	}
+
+	@Override
+	protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+		super.onLayout(changed, left, top, right, bottom);
+
+		Rect rect = new Rect();
+
+		getGlobalVisibleRect(rect);
+
+		mDraggableManager
+				.setTop(top)
+				.setBottom(bottom)
+				.setVisibleHeight(rect.height());
+	}
+
 	void calculateDaysCount() {
 		if(mStartDate == null || mEndDate == null) {
 			return;
@@ -266,6 +321,10 @@ public class WeekCalendarView extends View implements GestureDetector.OnGestureL
 		mFirstCellWidth = (mHoursTextWidth * FIRST_CELL_WIDTH_MULTIPLIER);
 		mCellHeight = height / mHoursCount;
 		mCellWidth = (width - mFirstCellWidth) / getColumnsCount();
+
+		mDraggableManager
+			.setCellWidth(mCellWidth)
+			.setCellHeight(mCellHeight);
 	}
 
 	int getColumnsCount() {
@@ -305,6 +364,8 @@ public class WeekCalendarView extends View implements GestureDetector.OnGestureL
 				drawHighlightedCell(canvas, mHighlightedDate, mFirstCellWidth, mCellHeight, mCellWidth, mCellHeight);
 			}
 		}
+
+		mDraggableManager.onDraw(canvas);
 	}
 
 	void drawHighlightedCell(Canvas canvas, DateTime date, float xOffset, float yOffset, float cellWidth, float cellHeight) {
@@ -316,7 +377,7 @@ public class WeekCalendarView extends View implements GestureDetector.OnGestureL
 		if(hourOffset % 2 == 1) {
 			mStripePaint.setColor(ColorHelper.darkenColor(originalColor, 0.5f));
 		} else {
-			mStripePaint.setColor(ColorHelper.darkenColor(0xFFFFFFFF, 0.5f));
+			mStripePaint.setColor(ColorHelper.darkenColor(0xFFFFFFFF, 0.75f));
 		}
 
 		canvas.drawRect(position.x, position.y, position.x + cellWidth, position.y + cellHeight, mStripePaint);
@@ -339,12 +400,12 @@ public class WeekCalendarView extends View implements GestureDetector.OnGestureL
 		for(int i = 0; i < horizontalCellsCount; ++i, y+= cellHeight, ++hour) {
 			hourText = (hour < 10 ? "0" : "") + hour;
 
+			if(i % 2 == 1) {
+				canvas.drawRect(0, y + 1, canvasWidth, y + cellHeight - 1, mStripePaint);
+			}
+
 			canvas.drawLine(0, y, canvasWidth, y, mLinePaint);
 			canvas.drawText(hourText, textOffsetX, y + textOffsetY, mHoursPaint);
-
-			if(i % 2 == 1) {
-				canvas.drawRect(firstColumnWidth, y + 1, canvasWidth, y + cellHeight - 1, mStripePaint);
-			}
 		}
 	}
 
@@ -387,7 +448,14 @@ public class WeekCalendarView extends View implements GestureDetector.OnGestureL
 				eventBackgroundPaint.setColor(event.getColor());
 			}
 
-			TextHelper.configureMaxTextSizeForBounds(text, eventTextPaint, cellWidth, cellHeight);
+			String cacheKey = TextHelper.getCacheKey(text, cellWidth, cellHeight);
+
+			if(TextHelper.sSizeCache.containsKey(cacheKey)) {
+				eventTextPaint.setTextSize(TextHelper.sSizeCache.get(cacheKey));
+			} else {
+				TextHelper.configureMaxTextSizeForBounds(text, eventTextPaint, cellWidth, cellHeight);
+				TextHelper.sSizeCache.put(cacheKey, eventTextPaint.getTextSize());
+			}
 
 			canvas.drawRect(position.x, position.y, position.x + cellWidth, position.y + cellHeight, eventBackgroundPaint);
 			TextHelper.drawText(text, canvas, eventTextPaint, position.x, position.y, cellWidth, cellHeight);
@@ -438,13 +506,11 @@ public class WeekCalendarView extends View implements GestureDetector.OnGestureL
 
 	@Override
 	public boolean onDown(MotionEvent e) {
-		// IGNORED
 		return true;
 	}
 
 	@Override
-	public void onShowPress(MotionEvent e) {
-	}
+	public void onShowPress(MotionEvent e) {}
 
 	@Override
 	public boolean onSingleTapUp(MotionEvent e) {
@@ -453,21 +519,68 @@ public class WeekCalendarView extends View implements GestureDetector.OnGestureL
 			mClickListener.onDateClicked(date);
 		}
 
+		// Apenas para eventos de acessibilidade
+		performClickAccessibilityAndFeedback();
+
 		return true;
 	}
 
-	@Override
-	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-		// IGNORED
-		return true;
+	void performClickAccessibilityAndFeedback() {
+		sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_CLICKED);
+		playSoundEffect(SoundEffectConstants.CLICK);
+	}
+
+	void startDrag(DateTime date, float x, float y) {
+		Event event;
+
+		if((event = mEvents.get(date)) == null) {
+			return;
+		}
+
+		if(mDragListener != null && ! mDragListener.onStartDrag(event)) {
+			return;
+		}
+
+		mIsDragging = true;
+		getParent().requestDisallowInterceptTouchEvent(true);
+
+		event = mEvents.remove(date);
+		XY cellPosition = getPositionForDate(date, mFirstCellWidth, getYOffset(), mCellWidth, mCellHeight);
+
+		// Algum evento anterior (provavel DropAction.WAIT sem retorno)
+		if(mDraggableManager.hasEvent()) {
+			Event previousEvent = mDraggableManager.popEvent();
+			mEvents.put(previousEvent.getDate(), previousEvent);
+		}
+
+		mDraggableManager
+				.setEvent(event)
+				.setX(x, cellPosition.x)
+				.setY(y, cellPosition.y);
+
+		mHighlightedDate = null;
+
+		invalidate();
 	}
 
 	@Override
 	public void onLongPress(MotionEvent e) {
-		if(mLongClickListener != null) {
-			DateTime date = getDateForPosition(e.getX(), e.getY());
-			mLongClickListener.onDateLongClicked(date);
+		DateTime date = getDateForPosition(e.getX(), e.getY());
+
+		if(! mDragEnabled) {
+			if(mLongClickListener != null) {
+				mLongClickListener.onDateLongClicked(date);
+			}
+		} else {
+			startDrag(date, e.getX(), e.getY());
 		}
+
+		performLongClickAccessibilityAndFeedback();
+	}
+
+	void performLongClickAccessibilityAndFeedback() {
+		sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_LONG_CLICKED);
+		performHapticFeedback(HapticFeedbackConstants.LONG_PRESS, HapticFeedbackConstants.FLAG_IGNORE_VIEW_SETTING | HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING);
 	}
 
 	@Override
@@ -477,34 +590,129 @@ public class WeekCalendarView extends View implements GestureDetector.OnGestureL
 	}
 
 	@Override
-	public boolean onTouchEvent(MotionEvent event) {
+	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+		// IGNORED
+		return true;
+	}
 
-		DateTime date = getDateForPosition(event.getX(), event.getY());
+	void revertDropEvent(Event event) {
+		DateTime dropTarget = event.getDate();
+		mDraggableManager.animateDrop(this, this, getPositionForDate(dropTarget, mFirstCellWidth, getYOffset(), mCellWidth, mCellHeight));
+	}
 
-		if(date == null) {
-			return super.onTouchEvent(event);
+	void startDrop(float x, float y) {
+		if(mIsDragging && mDraggableManager.hasEvent()) {
+			DateTime dropTarget = getDateForPosition(x, y);
+			Event event = mDraggableManager.getEvent();
+
+			mIsDragging = false;
+			getParent().requestDisallowInterceptTouchEvent(false);
+
+			// Ok, drop num lugar invalido!
+			if(dropTarget == null) {
+				revertDropEvent(event);
+				return;
+			}
+
+			if(mDragListener != null) {
+				Event dropEvent = mEvents.get(dropTarget);
+
+				// Esta dropando numa celula vazia e o Listener recusou...
+				if(dropEvent == null && ! mDragListener.onStopDrag(event, dropTarget)) {
+					revertDropEvent(event);
+					return;
+				} else if(dropEvent != null) {
+					DropAction action = mDragListener.onStopDrag(event, dropEvent);
+
+					if(action == DropAction.REVERT) {
+						revertDropEvent(event);
+					}
+
+					return;
+				}
+			}
+
+			event = mDraggableManager.popEvent();
+			event.setDate(dropTarget);
+
+			mEvents.put(dropTarget, event);
 		}
+	}
+
+	public void revertEventDrop(Event event) {
+		DateTime dropTarget = event.getDate();
+		mDraggableManager.animateDrop(this, this, getPositionForDate(dropTarget, mFirstCellWidth, getYOffset(), mCellWidth, mCellHeight));
+	}
+
+	public void commitEventDrop(Event event) {
+		DateTime dropTarget = event.getDate();
+
+		mDraggableManager.popEvent();
+		mEvents.put(dropTarget, event);
+
+		invalidate();
+	}
+
+	@Override
+	public void onAnimationEnd(Event event) {
+		mEvents.put(event.getDate(), event);
+		invalidate();
+	}
+
+	@Override
+	public boolean onTouchEvent(MotionEvent event) {
 
 		int actionEvent = event.getAction();
 
 		switch (actionEvent) {
 			case MotionEvent.ACTION_DOWN:
-				mHighlightedDate = date;
-				invalidate();
-				break;
-			case MotionEvent.ACTION_UP:
-				mHighlightedDate = null;
-				invalidate();
-				break;
-			case MotionEvent.ACTION_CANCEL:
-				mHighlightedDate = null;
-				invalidate();
-				break;
-			case MotionEvent.ACTION_MOVE:
-				if(mHighlightedDate != null) {
-					mHighlightedDate = null;
+
+				DateTime date = getDateForPosition(event.getX(), event.getY());
+
+				if(date != null) {
+					mHighlightedDate = date;
 					invalidate();
 				}
+
+				break;
+			case MotionEvent.ACTION_UP:
+
+				startDrop(event.getX(), event.getY());
+
+				mHighlightedDate = null;
+
+				// Redraw View
+				invalidate();
+
+				break;
+			case MotionEvent.ACTION_CANCEL:
+
+				startDrop(event.getX(), event.getY());
+
+				mHighlightedDate = null;
+
+				// Redraw View
+				invalidate();
+
+				break;
+			case MotionEvent.ACTION_MOVE:
+
+				if (mIsDragging) {
+
+					mDraggableManager
+						.setX(event.getX())
+						.setY(event.getY());
+
+					mDraggableManager.scrollIfNeeded((android.view.ViewGroup) getParent());
+				}
+
+				if (mHighlightedDate != null) {
+					mHighlightedDate = null;
+				}
+
+				// Redraw View
+				invalidate();
+
 				break;
 		}
 
@@ -556,6 +764,11 @@ public class WeekCalendarView extends View implements GestureDetector.OnGestureL
 		invalidate();
 	}
 
+	public void addEvent(Event event) {
+		mEvents.put(event.getDate(), event);
+		invalidate();
+	}
+
 	public void setOnDateClickListener(OnDateClickListener onDateClickListener) {
 		mClickListener = onDateClickListener;
 	}
@@ -564,11 +777,17 @@ public class WeekCalendarView extends View implements GestureDetector.OnGestureL
 		mLongClickListener = onDateLongClickListener;
 	}
 
+	public void setOnDragListener(OnDragListener onDragListener) {
+		mDragListener = onDragListener;
+	}
+
 	public void setTypeface(Typeface typeface) {
 		mTypeFace = typeface;
 
 		mTextPaint.setTypeface(mTypeFace);
 		mHoursPaint.setTypeface(mTypeFace);
+
+		mDraggableManager.setTypeface(mTypeFace);
 
 		resetHeaderRequestFlag();
 		configureHeaderValues();
@@ -604,6 +823,16 @@ public class WeekCalendarView extends View implements GestureDetector.OnGestureL
 		}
 	}
 
+	@Override
+	public void setOnClickListener(OnClickListener l) {
+		throw new RuntimeException("Use setOnDateClickListener instead.");
+	}
+
+	@Override
+	public void setOnLongClickListener(OnLongClickListener l) {
+		throw new RuntimeException("Use setOnDateLongClickListener instead.");
+	}
+
 	void resetHeaderRequestFlag() {
 		mHeaderRequestedLayout = false;
 	}
@@ -620,5 +849,11 @@ public class WeekCalendarView extends View implements GestureDetector.OnGestureL
 
 	public static interface OnDateLongClickListener {
 		public void onDateLongClicked(DateTime date);
+	}
+
+	public static interface OnDragListener {
+		public boolean onStartDrag(Event event);
+		public boolean onStopDrag(Event event, DateTime date);
+		public DropAction onStopDrag(Event draggedEvent, Event targetEvent);
 	}
 }
