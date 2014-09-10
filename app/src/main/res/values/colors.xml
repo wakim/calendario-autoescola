@@ -13,6 +13,8 @@
 
     <color name="white">#ffffffff</color>
     <color name="grey_200">#eeeeee</color>
+    <color name="grey_200_transparent">#44eeeeee</color>
     <color name="grey_300">#e0e0e0</color>
+    <color name="grey_300_transparent">#44e0e0e0</color>
     <color name="transparent">#00000000</color>
 </resources>

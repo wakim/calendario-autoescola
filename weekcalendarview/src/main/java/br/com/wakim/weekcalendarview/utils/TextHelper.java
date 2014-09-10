@@ -1,4 +1,4 @@
-package br.com.wakim.weekcalendarview;
+package br.com.wakim.weekcalendarview.utils;
 
 import android.graphics.Canvas;
 import android.graphics.Rect;
@@ -9,18 +9,20 @@ import android.text.TextPaint;
 import java.util.HashMap;
 import java.util.Map;
 
+import br.com.wakim.weekcalendarview.utils.WidthHeight;
+
 /**
  * Created by wakim on 02/09/14.
  */
 public abstract class TextHelper {
 
-	static Map<String, Float> sSizeCache = new HashMap<String, Float>();
+	public static Map<String, Float> sSizeCache = new HashMap<String, Float>();
 
-	static String getCacheKey(String text, float cellWidth, float cellHeight) {
+	public static String getCacheKey(String text, float cellWidth, float cellHeight) {
 		return text.concat("w").concat(Float.toString(cellWidth)).concat("h").concat(Float.toString(cellHeight));
 	}
 
-	static WidthHeight configureMaxTextSizeForBounds(String text, TextPaint textPaint, float width, float height) {
+	public static WidthHeight configureMaxTextSizeForBounds(String text, TextPaint textPaint, float width, float height) {
 		float textWidth = 0f, textHeight = 0f; // Our calculated text bounds
 		float textSize = textPaint.getTextSize();
 
@@ -45,7 +47,7 @@ public abstract class TextHelper {
 		return measureText(text, textPaint);
 	}
 
-	static WidthHeight measureText(String text, TextPaint textPaint) {
+	public static WidthHeight measureText(String text, TextPaint textPaint) {
 		float textWidth, textHeight; // Our calculated text bounds
 
 		// Now lets calculate the size of the text
@@ -60,7 +62,7 @@ public abstract class TextHelper {
 		return wh;
 	}
 
-	static void drawText(String text, Canvas canvas, TextPaint textPaint, float offsetX, float offsetY, float cellWidth, float cellHeight) {
+	public static void drawText(String text, Canvas canvas, TextPaint textPaint, float offsetX, float offsetY, float cellWidth, float cellHeight) {
 		StaticLayout staticLayout = new StaticLayout(text, textPaint, (int) cellWidth, Layout.Alignment.ALIGN_CENTER, 1.0f, 0.0f, false);
 
 		canvas.save();
@@ -68,6 +70,4 @@ public abstract class TextHelper {
 		staticLayout.draw(canvas);
 		canvas.restore();
 	}
-
-
 }

@@ -15,7 +15,8 @@ public abstract class Params {
 							   COLOR = "COLOR",
 							   EDITING_DISCIPLINA = "EDITING_DISCIPLINA",
 							   CURRENT_DATE = "CURRENT_DATE",
-							   GRID_MODE = "GRID_MODE";
+							   GRID_MODE = "GRID_MODE",
+							   CURRENT_PAGE = "CURRENT_PAGE";
 
 	public static final String DIALOG_TITLE = "DIALOG_TITLE",
 							   DIALOG_MESSAGE = "DIALOG_MESSAGE",

@@ -12,7 +12,6 @@ import android.os.Parcelable;
 import android.support.v4.view.GestureDetectorCompat;
 import android.text.TextPaint;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.HapticFeedbackConstants;
 import android.view.MotionEvent;
@@ -25,6 +24,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
 
+import br.com.wakim.weekcalendarview.listener.OnDateClickListener;
+import br.com.wakim.weekcalendarview.listener.OnDateLongClickListener;
+import br.com.wakim.weekcalendarview.utils.ColorHelper;
+import br.com.wakim.weekcalendarview.utils.TextHelper;
+import br.com.wakim.weekcalendarview.utils.WidthHeight;
+import br.com.wakim.weekcalendarview.utils.XY;
 import hirondelle.date4j.DateTime;
 
 /**
@@ -42,7 +47,7 @@ public class WeekCalendarView extends View implements GestureDetector.OnGestureL
 	int mStartHour, mEndHour;
 	int mHoursCount = -1, mDayCount= - 1;
 
-	boolean mInRequestLayout = false, mHeaderRequestedLayout = false;
+	boolean mHeaderRequestedLayout = false;
 	boolean mDragEnabled = false;
 
 	boolean mIsDragging = false;
@@ -60,7 +65,7 @@ public class WeekCalendarView extends View implements GestureDetector.OnGestureL
 
 	OnDateClickListener mClickListener;
 	OnDateLongClickListener mLongClickListener;
-	OnDragListener mDragListener;
+	br.com.wakim.weekcalendarview.listener.OnDragListener mDragListener;
 
 	GestureDetectorCompat mGestureDetector;
 
@@ -69,15 +74,15 @@ public class WeekCalendarView extends View implements GestureDetector.OnGestureL
 	WeekCalendarHeaderView mHeader;
 
 	private static final String PARENT_STATE = "WC_PARENT_STATE",
-								START_HOUR = "START_HOUR",
-								END_HOUR = "END_HOUR",
-								START_DATE = "START_DATE",
-								END_DATE = "END_DATE",
-								STRIPE_COLOR = "STRIPE_COLOR",
-								LINE_COLOR = "LINE_COLOR",
-								TEXT_SIZE = "TEXT_SIZE",
-								EVENTS = "EVENTS";
-
+								START_HOUR = "WC_START_HOUR",
+								END_HOUR = "WC_END_HOUR",
+								BASE_DATE = "WC_BASE_DATE",
+								START_DATE = "WC_START_DATE",
+								END_DATE = "WC_END_DATE",
+								STRIPE_COLOR = "WC_STRIPE_COLOR",
+								LINE_COLOR = "WC_LINE_COLOR",
+								TEXT_SIZE = "WC_TEXT_SIZE",
+								EVENTS = "WC_EVENTS";
 
 	@Override
 	protected void onDetachedFromWindow() {
@@ -113,6 +118,7 @@ public class WeekCalendarView extends View implements GestureDetector.OnGestureL
 		state.putParcelable(PARENT_STATE, superState);
 		state.putInt(START_HOUR, mStartHour);
 		state.putInt(END_HOUR, mEndHour);
+		state.putLong(BASE_DATE, mBaseDate.getMilliseconds(tz));
 		state.putLong(START_DATE, mStartDate.getMilliseconds(tz));
 		state.putLong(END_DATE, mEndDate.getMilliseconds(tz));
 		state.putInt(STRIPE_COLOR, mStripePaint.getColor());
@@ -146,6 +152,7 @@ public class WeekCalendarView extends View implements GestureDetector.OnGestureL
 
 		calculateDaysCount();
 
+		mBaseDate = DateTime.forInstant(savedState.getLong(BASE_DATE), tz);
 		mStartDate = DateTime.forInstant(savedState.getLong(START_DATE), tz);
 		mEndDate = DateTime.forInstant(savedState.getLong(END_DATE), tz);
 
@@ -194,7 +201,7 @@ public class WeekCalendarView extends View implements GestureDetector.OnGestureL
 
 			mDragEnabled = a.getBoolean(R.styleable.WeekCalendarView_drag_enabled, false);
 
-			mHoursCount = (mEndHour - mStartHour) + 1;
+			calculateHoursCount();
 
 			float textSize = a.getDimensionPixelSize(R.styleable.WeekCalendarView_font_size, 14);
 
@@ -214,44 +221,19 @@ public class WeekCalendarView extends View implements GestureDetector.OnGestureL
 		configureHeaderValues();
 
 		// Not drawing now, waiting for dates
-		setWillNotDraw(true);
+		checkIfWillNotDraw();
 	}
 
-	@Override
 	public void requestLayout() {
-		mInRequestLayout = true;
-		super.requestLayout();
-		mInRequestLayout = false;
-	}
-
-	public void setDragEnabled(boolean dragEnabled) {
-		mDragEnabled = dragEnabled;
-	}
-
-	public void setBaseDate(DateTime baseDate) {
-		mBaseDate = baseDate;
-
-		// Not need to recalculate size, just redraw
-		invalidate();
-	}
-
-	public void setStartDate(DateTime startDate) {
-		mStartDate = startDate;
-		calculateDaysCount();
-
-		requestLayout();
-	}
-
-	public void setEndDate(DateTime endDate) {
-		mEndDate = endDate;
-		calculateDaysCount();
-
-		requestLayout();
+		// If some setter call requestLayout before its get measured, so this call can be rejected.
+		if(getMeasuredWidth() != 0) {
+			super.requestLayout();
+		}
 	}
 
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-		int mWidth = 0, mHeight = 0;
+		int width = 0, height = 0;
 
 		int suggestedWidth = MeasureSpec.getSize(widthMeasureSpec);
 		int suggestedHeight = MeasureSpec.getSize(heightMeasureSpec);
@@ -260,16 +242,16 @@ public class WeekCalendarView extends View implements GestureDetector.OnGestureL
 
 		// Not matter, i want the maximum width
 		if(Build.VERSION.SDK_INT >= 16) {
-			mWidth = Math.max(getMinimumWidth(), suggestedWidth);
+			width = Math.max(getMinimumWidth(), suggestedWidth);
 		} else {
-			mWidth = suggestedWidth;
+			width = suggestedWidth;
 		}
 
 		if(heightMode == MeasureSpec.EXACTLY || heightMode == MeasureSpec.AT_MOST) {
 			if(Build.VERSION.SDK_INT >= 16) {
-				mHeight = Math.max(getMinimumHeight(), suggestedHeight);
+				height = Math.max(getMinimumHeight(), suggestedHeight);
 			} else {
-				mHeight = suggestedHeight;
+				height = suggestedHeight;
 			}
 		} else {
 			WidthHeight textBounds = TextHelper.measureText("MM", mHoursPaint); // Mede o maior texto de duas letras
@@ -277,20 +259,20 @@ public class WeekCalendarView extends View implements GestureDetector.OnGestureL
 			mHoursTextWidth = textBounds.width;
 			mHoursTextHeight = textBounds.height;
 
-			mHeight = (int) ((mHoursTextHeight * CELL_HEIGHT_MULTIPLIER) * (mHoursCount + 1)); // +1 para o cabecalho
+			height = (int) ((mHoursTextHeight * CELL_HEIGHT_MULTIPLIER) * (mHoursCount + 1)); // +1 para o cabecalho
 		}
 
-		calculateCellSizes(mWidth, mHeight);
-		setMeasuredDimension(mWidth, mHeight);
+		calculateCellSizes(width, height);
+		setMeasuredDimension(width, height);
 
-		// As dimensoes ja foram medidas...
+		// Dimensions already measured, configure Header Cell Width, and Cell Height.
 		configureHeaderValues();
+		checkIfWillNotDraw();
 	}
 
 	@Override
 	protected void onAttachedToWindow() {
 		super.onAttachedToWindow();
-
 		setHapticFeedbackEnabled(true);
 	}
 
@@ -306,33 +288,6 @@ public class WeekCalendarView extends View implements GestureDetector.OnGestureL
 				.setTop(top)
 				.setBottom(bottom)
 				.setVisibleHeight(rect.height());
-	}
-
-	void calculateDaysCount() {
-		if(mStartDate == null || mEndDate == null) {
-			return;
-		}
-
-		mDayCount = mStartDate.numDaysFrom(mEndDate) + 1;
-		setWillNotDraw(false);
-	}
-
-	void calculateCellSizes(float width, float height) {
-		mFirstCellWidth = (mHoursTextWidth * FIRST_CELL_WIDTH_MULTIPLIER);
-		mCellHeight = height / mHoursCount;
-		mCellWidth = (width - mFirstCellWidth) / getColumnsCount();
-
-		mDraggableManager
-			.setCellWidth(mCellWidth)
-			.setCellHeight(mCellHeight);
-	}
-
-	int getColumnsCount() {
-		return mDayCount;
-	}
-
-	int getRowsCount() {
-		return mHoursCount;
 	}
 
 	@Override
@@ -516,7 +471,13 @@ public class WeekCalendarView extends View implements GestureDetector.OnGestureL
 	public boolean onSingleTapUp(MotionEvent e) {
 		if(mClickListener != null) {
 			DateTime date = getDateForPosition(e.getX(), e.getY());
-			mClickListener.onDateClicked(date);
+			Event event = mEvents.get(date);
+
+			if(event == null) {
+				mClickListener.onDateClicked(date);
+			} else {
+				mClickListener.onDateClicked(date, event);
+			}
 		}
 
 		// Apenas para eventos de acessibilidade
@@ -547,16 +508,16 @@ public class WeekCalendarView extends View implements GestureDetector.OnGestureL
 		event = mEvents.remove(date);
 		XY cellPosition = getPositionForDate(date, mFirstCellWidth, getYOffset(), mCellWidth, mCellHeight);
 
-		// Algum evento anterior (provavel DropAction.WAIT sem retorno)
+		// Possible previous event (probably from DropAction.WAIT without future action)
 		if(mDraggableManager.hasEvent()) {
 			Event previousEvent = mDraggableManager.popEvent();
 			mEvents.put(previousEvent.getDate(), previousEvent);
 		}
 
 		mDraggableManager
-				.setEvent(event)
-				.setX(x, cellPosition.x)
-				.setY(y, cellPosition.y);
+			.setEvent(event)
+			.setX(x, cellPosition.x)
+			.setY(y, cellPosition.y);
 
 		mHighlightedDate = null;
 
@@ -569,7 +530,13 @@ public class WeekCalendarView extends View implements GestureDetector.OnGestureL
 
 		if(! mDragEnabled) {
 			if(mLongClickListener != null) {
-				mLongClickListener.onDateLongClicked(date);
+				Event event = mEvents.get(date);
+
+				if(event == null) {
+					mLongClickListener.onDateLongClicked(date);
+				} else {
+					mLongClickListener.onDateLongClicked(date, event);
+				}
 			}
 		} else {
 			startDrag(date, e.getX(), e.getY());
@@ -608,30 +575,38 @@ public class WeekCalendarView extends View implements GestureDetector.OnGestureL
 			mIsDragging = false;
 			getParent().requestDisallowInterceptTouchEvent(false);
 
-			// Ok, drop num lugar invalido!
+			// Ok, invalid drop (first column or out of bounds)
 			if(dropTarget == null) {
 				revertDropEvent(event);
 				return;
 			}
 
+			// We have a listener?
 			if(mDragListener != null) {
 				Event dropEvent = mEvents.get(dropTarget);
 
-				// Esta dropando numa celula vazia e o Listener recusou...
+				// Dropping in a empty cell and the listener refuse...
+				// Immediate revert
 				if(dropEvent == null && ! mDragListener.onStopDrag(event, dropTarget)) {
 					revertDropEvent(event);
 					return;
 				} else if(dropEvent != null) {
 					DropAction action = mDragListener.onStopDrag(event, dropEvent);
 
+					// If the listener wants an immediate revert, lets do it
 					if(action == DropAction.REVERT) {
 						revertDropEvent(event);
 					}
+
+					// If the listener wants to wait for revert or commit an drop in future.
+					// nothing is done now.
 
 					return;
 				}
 			}
 
+			// No Listener, so we can commit the drop
+			// Or the listener accepted to replace an existing event
 			event = mDraggableManager.popEvent();
 			event.setDate(dropTarget);
 
@@ -723,13 +698,70 @@ public class WeekCalendarView extends View implements GestureDetector.OnGestureL
 		return getPositionForDate(date, mFirstCellWidth, mCellHeight, mCellWidth, mCellHeight);
 	}
 
-	public void setStartHour(int startHour) {
-		mStartHour = startHour;
+	//
+	// Getters and Setters
+	//
 
-		mHoursCount = (mEndHour - mStartHour) + 1;
+	public void setDragEnabled(boolean dragEnabled) {
+		mDragEnabled = dragEnabled;
+	}
+
+	public void setBaseDate(DateTime baseDate) {
+		mBaseDate = baseDate;
+
+		// Not need to recalculate size, just redraw
+		invalidate();
+	}
+
+	public void setDates(DateTime baseDate, DateTime startDate, DateTime endDate) {
+
+		if(mBaseDate != null && mBaseDate.equals(baseDate) &&
+			mStartDate != null && mStartDate.equals(startDate) &&
+			mEndDate != null && mEndDate.equals(endDate)) {
+
+			return;
+		}
+
+		mBaseDate = baseDate;
+		mStartDate = startDate;
+		mEndDate = endDate;
+
+		calculateDaysCount();
 
 		resetHeaderRequestFlag();
 		configureHeaderValues();
+
+		requestLayout();
+	}
+
+	public void setStartDate(DateTime startDate) {
+		mStartDate = startDate;
+
+		calculateDaysCount();
+
+		resetHeaderRequestFlag();
+		configureHeaderValues();
+
+		requestLayout();
+	}
+
+	public void setEndDate(DateTime endDate) {
+		mEndDate = endDate;
+
+		calculateDaysCount();
+
+		resetHeaderRequestFlag();
+		configureHeaderValues();
+
+		requestLayout();
+	}
+
+	public void setStartHour(int startHour) {
+		mStartHour = startHour;
+
+		calculateHoursCount();
+
+		resetHeaderRequestFlag();
 
 		// Need to recalculate height
 		requestLayout();
@@ -738,11 +770,11 @@ public class WeekCalendarView extends View implements GestureDetector.OnGestureL
 	public void setEndHour(int endHour) {
 		mEndHour = endHour;
 
-		mHoursCount = (mEndHour - mStartHour) + 1;
+		calculateHoursCount();
 
 		resetHeaderRequestFlag();
-		configureHeaderValues();
 
+		// Need to recalculate height
 		requestLayout();
 	}
 
@@ -760,7 +792,6 @@ public class WeekCalendarView extends View implements GestureDetector.OnGestureL
 
 	public void setEvents(Map<DateTime, Event> events) {
 		mEvents = events;
-
 		invalidate();
 	}
 
@@ -777,7 +808,7 @@ public class WeekCalendarView extends View implements GestureDetector.OnGestureL
 		mLongClickListener = onDateLongClickListener;
 	}
 
-	public void setOnDragListener(OnDragListener onDragListener) {
+	public void setOnDragListener(br.com.wakim.weekcalendarview.listener.OnDragListener onDragListener) {
 		mDragListener = onDragListener;
 	}
 
@@ -803,13 +834,13 @@ public class WeekCalendarView extends View implements GestureDetector.OnGestureL
 
 	void configureHeaderValues() {
 
-		if(mHeader == null) {
+		if(mHeader == null || mStartDate == null) {
 			return;
 		}
 
 		mHeader.setStartDate(mStartDate);
 		mHeader.setDays(getColumnsCount());
-		mHeader.setTextSize(mTextPaint.getTextSize());
+		mHeader.setTextSize(mHoursPaint.getTextSize());
 		mHeader.setTypeface(mTypeFace);
 		mHeader.setCellHeight(mCellHeight);
 		mHeader.setCellWidth(mCellWidth);
@@ -818,7 +849,6 @@ public class WeekCalendarView extends View implements GestureDetector.OnGestureL
 
 		if(! mHeaderRequestedLayout) {
 			mHeader.requestLayout();
-
 			mHeaderRequestedLayout = true;
 		}
 	}
@@ -843,17 +873,44 @@ public class WeekCalendarView extends View implements GestureDetector.OnGestureL
 		}
 	}
 
-	public static interface OnDateClickListener {
-		public void onDateClicked(DateTime date);
+	void calculateDaysCount() {
+		if(mStartDate == null || mEndDate == null) {
+			return;
+		}
+
+		if(mEndDate.lt(mStartDate)) {
+			throw new RuntimeException("End date must be greater than start date! (" + mStartDate.toString() + ", " + mEndDate.toString() + ")");
+		}
+
+		mDayCount = mStartDate.numDaysFrom(mEndDate) + 1;
+		checkIfWillNotDraw();
 	}
 
-	public static interface OnDateLongClickListener {
-		public void onDateLongClicked(DateTime date);
+	void checkIfWillNotDraw() {
+		boolean willNotDraw = mStartDate == null || mBaseDate == null || mEndDate == null;
+
+		setWillNotDraw(willNotDraw);
 	}
 
-	public static interface OnDragListener {
-		public boolean onStartDrag(Event event);
-		public boolean onStopDrag(Event event, DateTime date);
-		public DropAction onStopDrag(Event draggedEvent, Event targetEvent);
+	void calculateHoursCount() {
+		mHoursCount = (mEndHour - mStartHour) + 1;
+	}
+
+	void calculateCellSizes(float width, float height) {
+		mFirstCellWidth = (mHoursTextWidth * FIRST_CELL_WIDTH_MULTIPLIER);
+		mCellHeight = height / (mHoursCount + 1); // Cabecalho
+		mCellWidth = (width - mFirstCellWidth) / getColumnsCount();
+
+		mDraggableManager
+			.setCellWidth(mCellWidth)
+			.setCellHeight(mCellHeight);
+	}
+
+	int getColumnsCount() {
+		return mDayCount;
+	}
+
+	int getRowsCount() {
+		return mHoursCount;
 	}
 }

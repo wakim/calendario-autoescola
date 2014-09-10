@@ -1,16 +1,28 @@
 package br.com.wakim.autoescola.calendario.app.fragment;
 
 import android.app.Activity;
+import android.content.res.AssetManager;
+import android.content.res.XmlResourceParser;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.support.v7.app.ActionBarActivity;
 import android.text.Html;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.Map;
@@ -27,13 +39,14 @@ import br.com.wakim.weekcalendarview.DropAction;
 import br.com.wakim.weekcalendarview.Event;
 import br.com.wakim.weekcalendarview.WeekCalendarHeaderView;
 import br.com.wakim.weekcalendarview.WeekCalendarView;
+import br.com.wakim.weekcalendarview.listener.OnDragListener;
 import hirondelle.date4j.DateTime;
 
 /**
  * Created by wakim on 17/08/14.
  */
-public class FragmentSumarioAulasIntervalo extends Fragment implements LoaderManager.LoaderCallbacks<Map<DateTime, Event>>,
-		WeekCalendarView.OnDragListener {
+public class FragmentSumarioAulasIntervalo extends Fragment
+	implements LoaderManager.LoaderCallbacks<Map<DateTime, Event>>, OnDragListener {
 
 	AulasAsyncTaskLoader mLoader;
 	DateTime mBaseDate;
@@ -46,11 +59,7 @@ public class FragmentSumarioAulasIntervalo extends Fragment implements LoaderMan
 
 	DateFormat mDateFormat = DateFormat.getDateTimeInstance();
 
-	public static FragmentSumarioAulasIntervalo newInstance(Date baseDate, GridMode mode) {
-		return newInstance(CalendarHelper.convertDateToDateTime(baseDate), mode);
-	}
-
-	public static FragmentSumarioAulasIntervalo newInstance(DateTime baseDate, GridMode mode) {
+	public static FragmentSumarioAulasIntervalo newInstance(DateTime baseDate, GridMode mode, int loaderIncrementId) {
 		Bundle bundle = new Bundle();
 		FragmentSumarioAulasIntervalo fragment = new FragmentSumarioAulasIntervalo();
 
@@ -73,6 +82,7 @@ public class FragmentSumarioAulasIntervalo extends Fragment implements LoaderMan
 	public void onDestroyView() {
 		super.onDestroyView();
 
+		getLoaderManager().destroyLoader(Params.AULAS_DIA_LOADER_ID);
 		mLoader = null;
 	}
 
@@ -80,8 +90,10 @@ public class FragmentSumarioAulasIntervalo extends Fragment implements LoaderMan
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		mBaseDate = getArguments().containsKey(Params.CURRENT_DATE) ? (DateTime) getArguments().getSerializable(Params.CURRENT_DATE) : mBaseDate;
-		mMode = getArguments().containsKey(Params.GRID_MODE) ? (GridMode) getArguments().getSerializable(Params.GRID_MODE) : mMode;
+		if(getArguments() != null) {
+			mBaseDate = getArguments().containsKey(Params.CURRENT_DATE) ? (DateTime) getArguments().getSerializable(Params.CURRENT_DATE) : mBaseDate;
+			mMode = getArguments().containsKey(Params.GRID_MODE) ? (GridMode) getArguments().getSerializable(Params.GRID_MODE) : mMode;
+		}
 
 		if(savedInstanceState != null) {
 			mBaseDate = (DateTime) savedInstanceState.getSerializable(Params.CURRENT_DATE);
@@ -96,21 +108,38 @@ public class FragmentSumarioAulasIntervalo extends Fragment implements LoaderMan
 		mWeekCalendarView = (WeekCalendarView) view.findViewById(R.id.fsad_calendar_view);
 		mWeekCalendarHeaderView = (WeekCalendarHeaderView) view.findViewById(R.id.fsad_calendar_header_view);
 
-		mWeekCalendarHeaderView.setAbbreviateDays(mMode == GridMode.WEEK);
-		mWeekCalendarHeaderView.setTwoLineHeader(mMode == GridMode.WEEK);
-
-		mWeekCalendarView.setBaseDate(mBaseDate);
-		mWeekCalendarView.setStartDate(mMode.getStartDate(mBaseDate));
-		mWeekCalendarView.setEndDate(mMode.getEndDate(mBaseDate));
 		mWeekCalendarView.setTypeface(FontHelper.loadTypeface(getActivity(), 1));
-
 		mWeekCalendarView.setHeader(mWeekCalendarHeaderView);
 
 		mWeekCalendarView.setOnDragListener(this);
 
-		getLoaderManager().initLoader(Params.AULAS_DIA_LOADER_ID, null, this);
+		mWeekCalendarView.setTag(getTag());
+		mWeekCalendarHeaderView.setTag(getTag());
+
+		mLoader = (AulasAsyncTaskLoader) getLoaderManager().initLoader(Params.AULAS_DIA_LOADER_ID, null, this);
+
+		((ActionBarActivity) getActivity()).setSupportProgressBarIndeterminateVisibility(true);
 
 		return view;
+	}
+
+	@Override
+	public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+		super.onViewStateRestored(savedInstanceState);
+
+		populateData();
+	}
+
+	public void populateData() {
+
+		if(mWeekCalendarView == null || mWeekCalendarHeaderView == null) {
+			return;
+		}
+
+		mWeekCalendarHeaderView.setAbbreviateDays(mMode == GridMode.WEEK);
+		mWeekCalendarHeaderView.setTwoLineHeader(mMode == GridMode.WEEK);
+
+		mWeekCalendarView.setDates(mBaseDate, mMode.getStartDate(mBaseDate), mMode.getEndDate(mBaseDate));
 	}
 
 	@Override
@@ -129,6 +158,21 @@ public class FragmentSumarioAulasIntervalo extends Fragment implements LoaderMan
 
 		outState.putSerializable(Params.CURRENT_DATE, mBaseDate);
 		outState.putSerializable(Params.GRID_MODE, mMode);
+	}
+
+	public void setGridMode(GridMode mode) {
+		changeMode(mode);
+	}
+
+	public void setBaseDate(DateTime baseDate) {
+
+		mBaseDate = baseDate;
+
+		if(getActivity() != null) {
+			updateDateInterval();
+		}
+
+		populateData();
 	}
 
 	AulasAsyncTaskLoader updateDateInterval() {
@@ -155,6 +199,7 @@ public class FragmentSumarioAulasIntervalo extends Fragment implements LoaderMan
 		}
 
 		tryChangeMode();
+		((ActionBarActivity) getActivity()).setSupportProgressBarIndeterminateVisibility(false);
 	}
 
 	@Override
@@ -166,19 +211,17 @@ public class FragmentSumarioAulasIntervalo extends Fragment implements LoaderMan
 	public void changeMode(GridMode mode) {
 		if(mMode != mode) {
 			mMode = mode;
-			mModeChanged = true;
 
-			mLoader.updateDates(mMode.getStartDate(mBaseDate), mMode.getEndDate(mBaseDate));
+			if(mLoader != null) {
+				mModeChanged = true;
+				updateDateInterval();
+			}
 		}
 	}
 
 	void tryChangeMode() {
 		if(mModeChanged && mWeekCalendarView != null) {
-			mWeekCalendarHeaderView.setTwoLineHeader(mMode == GridMode.WEEK);
-			mWeekCalendarHeaderView.setAbbreviateDays(mMode == GridMode.WEEK);
-
-			mWeekCalendarView.setStartDate(mMode.getStartDate(mBaseDate));
-			mWeekCalendarView.setEndDate(mMode.getEndDate(mBaseDate));
+			populateData();
 		}
 	}
 
@@ -230,5 +273,13 @@ public class FragmentSumarioAulasIntervalo extends Fragment implements LoaderMan
 		alert.setShowsDialog(true);
 		alert.setCancelable(true);
 		alert.show(getChildFragmentManager(), getString(R.string.alert_dialog_tag));
+	}
+
+	public DateTime getBaseDate() {
+		return mBaseDate;
+	}
+
+	public GridMode getGridMode() {
+		return mMode;
 	}
 }

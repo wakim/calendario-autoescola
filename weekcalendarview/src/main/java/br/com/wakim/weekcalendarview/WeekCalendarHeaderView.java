@@ -11,9 +11,10 @@ import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.view.View;
 
-import java.util.ArrayList;
 import java.util.TimeZone;
 
+import br.com.wakim.weekcalendarview.utils.TextHelper;
+import br.com.wakim.weekcalendarview.utils.WidthHeight;
 import hirondelle.date4j.DateTime;
 
 /**
@@ -36,12 +37,12 @@ public class WeekCalendarHeaderView extends View {
 
 	TextPaint mTextPaint = new TextPaint();
 
-	private static final String PARENT_STATE = "WC_PARENT_STATE",
-								TWO_LINE_HEADER = "TWO_LINE_HEADER",
-								ABREVIATTED_DAYS = "ABREVIATTED_DAYS",
-								DAYS = "DAYS",
-								TEXT_SIZE = "TEXT_SIZE",
-								START_DATE = "START_DATE";
+	private static final String PARENT_STATE = "WCH_PARENT_STATE",
+								TWO_LINE_HEADER = "WCH_TWO_LINE_HEADER",
+								ABREVIATTED_DAYS = "WCH_ABREVIATTED_DAYS",
+								DAYS = "WCH_DAYS",
+								TEXT_SIZE = "WCH_TEXT_SIZE",
+								START_DATE = "WCH_START_DATE";
 
 	@Override
 	protected Parcelable onSaveInstanceState() {
@@ -99,6 +100,7 @@ public class WeekCalendarHeaderView extends View {
 	public WeekCalendarHeaderView(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		init(context, attrs, 0);
+
 		// Not drawing now, waiting for dates
 		setWillNotDraw(true);
 	}
@@ -121,7 +123,7 @@ public class WeekCalendarHeaderView extends View {
 
 			int textSize = a.getDimensionPixelSize(R.styleable.WeekCalendarHeaderView_preferred_font_size, 14);
 
-			mTextPaint.setTextSize(textSize * 0.75f);
+			mTextPaint.setTextSize(textSize);
 
 			a.recycle();
 		}
@@ -133,12 +135,15 @@ public class WeekCalendarHeaderView extends View {
 
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+		int width, height;
+
 		if(mCellWidth != 0 && mCellHeight != 0 && mDays != 0) {
-			setMeasuredDimension((int) (mOffsetX + (mCellWidth * (mDays + 1))), (int) mCellHeight);
+			width = (int) (mOffsetX + (mCellWidth * mDays));
+			height = (int) mCellHeight;
+
+			setMeasuredDimension(width, height);
 			return;
 		}
-
-		int width, height;
 
 		int suggestedWidth = MeasureSpec.getSize(widthMeasureSpec);
 		int suggestedHeight = MeasureSpec.getSize(heightMeasureSpec);
@@ -152,18 +157,15 @@ public class WeekCalendarHeaderView extends View {
 			width = suggestedWidth;
 		}
 
-		if(heightMode == MeasureSpec.EXACTLY || heightMode == MeasureSpec.AT_MOST) {
+		if(heightMode == MeasureSpec.EXACTLY) {
 			if(Build.VERSION.SDK_INT >= 16) {
 				height = Math.max(getMinimumHeight(), suggestedHeight);
 			} else {
 				height = suggestedHeight;
 			}
 		} else {
-			WidthHeight textBounds = TextHelper.measureText("MM", mTextPaint); // Mede o maior texto de duas letras
-
-			float hoursTextHeight = textBounds.height;
-
-			height = (int) (hoursTextHeight * WeekCalendarView.CELL_HEIGHT_MULTIPLIER);
+			WidthHeight textBounds = TextHelper.measureText("MM", mTextPaint); // Based on WeekCalendarHeaderView calculation
+			height = (int) (textBounds.height * WeekCalendarView.CELL_HEIGHT_MULTIPLIER);
 		}
 
 		setMeasuredDimension(width, height);
@@ -204,7 +206,13 @@ public class WeekCalendarHeaderView extends View {
 	}
 
 	void setStartDate(DateTime startDate) {
+
+		if(mStartDate != null && mStartDate.equals(startDate)) {
+			return;
+		}
+
 		mStartDate = startDate;
+
 		verifyIfWillDraw();
 	}
 
@@ -213,16 +221,32 @@ public class WeekCalendarHeaderView extends View {
 	}
 
 	void setCellWidth(float cellWidth) {
+
+		if(mCellWidth == cellWidth) {
+			return;
+		}
+
 		mCellWidth = cellWidth;
+
 		verifyIfWillDraw();
 	}
 
 	void setCellHeight(float cellHeight) {
+
+		if(mCellHeight == cellHeight) {
+			return;
+		}
+
 		mCellHeight = cellHeight;
 		verifyIfWillDraw();
 	}
 
 	void setOffsetX(float offsetX) {
+
+		if(mOffsetX == offsetX) {
+			return;
+		}
+
 		mOffsetX = offsetX;
 		verifyIfWillDraw();
 	}
@@ -236,6 +260,11 @@ public class WeekCalendarHeaderView extends View {
 	}
 
 	void setDays(int days) {
+
+		if(mDays == days) {
+			return;
+		}
+
 		mDays = days;
 		verifyIfWillDraw();
 	}
@@ -253,13 +282,11 @@ public class WeekCalendarHeaderView extends View {
 	public void setAbbreviateDays(boolean abbreviateDays) {
 		mAbbreviateDays = abbreviateDays;
 		mDayLabels = getContext().getResources().getStringArray(mAbbreviateDays ? R.array.wc__abreviatted_days : R.array.wc__days);
-
 		invalidate();
 	}
 
 	public void setTwoLineHeader(boolean twoLineHeader) {
 		mTwoLineHeader = twoLineHeader;
-
 		invalidate();
 	}
 }

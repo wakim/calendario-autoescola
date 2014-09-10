@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@color/white">
+
+    <br.com.wakim.autoescola.calendario.app.view.RobotoTextView
+        android:id="@android:id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/Material.TextView.Title"
+        android:text="@string/escolher_data"
+        android:paddingLeft="@dimen/margin_dialog_body"
+        android:paddingRight="@dimen/margin_dialog_body"
+        android:paddingTop="@dimen/margin_dialog_body"
+        app:typeface="medium" />
+
+    <DatePicker
+        android:id="@+id/date_picker"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:calendarViewShown="false"
+        android:spinnersShown="true"
+        android:layout_marginLeft="@dimen/margin_dialog_body"
+        android:layout_marginStart="@dimen/margin_dialog_body"
+        android:layout_marginRight="@dimen/margin_dialog_body"
+        android:layout_marginEnd="@dimen/margin_dialog_body"
+        android:layout_marginTop="@dimen/margin_dialog_body" />
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/margin_dialog_bottom"
+        android:gravity="right"
+        android:weightSum="2">
+
+        <br.com.wakim.autoescola.calendario.app.view.RobotoTextView
+            android:id="@android:id/button2"
+            style="@style/Material.TextView.Button"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/height_text_button"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="@string/cancelar_caps"
+            app:typeface="medium"/>
+
+        <br.com.wakim.autoescola.calendario.app.view.RobotoTextView
+            android:id="@android:id/button1"
+            style="@style/Material.TextView.Button"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/height_text_button"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:textColor="@color/dialog_confirm"
+            android:text="@string/ok_caps"
+            app:typeface="medium" />
+    </LinearLayout>
+</LinearLayout>

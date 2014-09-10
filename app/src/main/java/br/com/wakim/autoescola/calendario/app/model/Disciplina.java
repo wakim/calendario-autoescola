@@ -141,6 +141,10 @@ public class Disciplina extends Model implements Parcelable {
 			}
 
 			totalAulasRestantes = limite - concluidas;
+
+			if(totalAulasRestantes < 0) {
+				totalAulasRestantes = 0;
+			}
 		}
 	}
 

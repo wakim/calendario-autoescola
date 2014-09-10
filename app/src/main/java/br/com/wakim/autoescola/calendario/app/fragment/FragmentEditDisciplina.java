@@ -18,6 +18,7 @@ import br.com.wakim.autoescola.calendario.R;
 import br.com.wakim.autoescola.calendario.app.model.Disciplina;
 import br.com.wakim.autoescola.calendario.app.utils.ColorHelper;
 import br.com.wakim.autoescola.calendario.app.utils.Params;
+import br.com.wakim.autoescola.calendario.app.view.RobotoTextView;
 
 /**
  * Created by wakim on 12/08/14.
@@ -30,7 +31,7 @@ public class FragmentEditDisciplina extends Fragment implements View.OnClickList
 	Integer mCor;
 
 	EditText mName, mSymbol, mLimit;
-	View mColor;
+	RobotoTextView mColor;
 
 	ViewGroup mDataLayout;
 
@@ -94,7 +95,7 @@ public class FragmentEditDisciplina extends Fragment implements View.OnClickList
 
 		mDataLayout = (ViewGroup) view.findViewById(R.id.fnd_data_body);
 
-		mColor = mDataLayout.findViewById(R.id.fnd_color);
+		mColor = (RobotoTextView) mDataLayout.findViewById(R.id.fnd_color);
 		mName = (EditText) mDataLayout.findViewById(R.id.fnd_nome);
 		mSymbol = (EditText) mDataLayout.findViewById(R.id.fnd_simbolo);
 		mLimit = (EditText) mDataLayout.findViewById(R.id.fnd_limite);
@@ -118,7 +119,7 @@ public class FragmentEditDisciplina extends Fragment implements View.OnClickList
 			}
 		}
 
-		ColorHelper.configureColor(mColor, mCor);
+		//ColorHelper.configureColor(mColor, mCor);
 
 		mSnackBar = new SnackBar(getActivity());
 

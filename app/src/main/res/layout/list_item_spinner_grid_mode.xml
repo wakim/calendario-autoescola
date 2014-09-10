@@ -3,11 +3,17 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
+    android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
     <br.com.wakim.autoescola.calendario.app.view.RobotoTextView
+        android:id="@android:id/text2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         style="@style/Material.List.TextView.Secondary"
@@ -15,12 +21,25 @@
         android:text="Hoje, Segunda"
         app:typeface="regular" />
 
-    <br.com.wakim.autoescola.calendario.app.view.RobotoTextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        style="@style/Material.List.TextView.Primary"
-        android:textColor="@color/white"
-        android:text="Setembro 1, 2014"
-        app:typeface="medium" />
+        <br.com.wakim.autoescola.calendario.app.view.RobotoTextView
+            android:id="@android:id/text1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/Material.List.TextView.Primary"
+            android:textColor="@color/white"
+            android:text="Setembro 1, 2014"
+            app:typeface="medium" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="12dp"
+        android:layout_height="12dp"
+        android:background="@drawable/triangle"
+        android:layout_gravity="center"
+        android:layout_marginStart="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginTop="4dp" />
 
 </LinearLayout>

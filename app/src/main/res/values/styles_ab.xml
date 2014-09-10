@@ -67,7 +67,7 @@
     </style>
 	
     <style name="DropDownNav.Ab" parent="@style/Widget.AppCompat.Spinner.DropDown.ActionBar">
-        <item name="android:background">@drawable/spinner_background_ab_ab</item>
+        <!--<item name="android:background">@drawable/spinner_background_ab_ab</item>-->
         <item name="android:popupBackground">@drawable/menu_dropdown_panel_ab</item>
         <item name="android:dropDownSelector">@drawable/selectable_background_ab</item>
     </style>

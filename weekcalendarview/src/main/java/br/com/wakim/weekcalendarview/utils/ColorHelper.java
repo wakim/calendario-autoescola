@@ -1,4 +1,4 @@
-package br.com.wakim.weekcalendarview;
+package br.com.wakim.weekcalendarview.utils;
 
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;

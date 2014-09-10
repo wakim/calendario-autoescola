@@ -1,22 +1,15 @@
 package br.com.wakim.weekcalendarview;
 
 import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.LinearGradient;
 import android.graphics.Paint;
-import android.graphics.RadialGradient;
 import android.graphics.RectF;
-import android.graphics.Shader;
-import android.graphics.SweepGradient;
 import android.graphics.Typeface;
 import android.text.TextPaint;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.util.Map;
-
-import hirondelle.date4j.DateTime;
+import br.com.wakim.weekcalendarview.utils.TextHelper;
+import br.com.wakim.weekcalendarview.utils.XY;
 
 /**
  * Created by wakim on 03/09/14.
@@ -50,6 +43,7 @@ public class DraggableManager {
 	void destroy() {
 		mEvent = null;
 		mBackgroundPaint = mShadowPaint = mTextPaint = null;
+		mAnimationRunnable = null;
 	}
 
 	public DraggableManager() {

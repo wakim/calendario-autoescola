@@ -10,6 +10,7 @@
     android:paddingTop="8dp">
 
     <br.com.wakim.autoescola.calendario.app.view.RobotoTextView
+        android:id="@android:id/text1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
@@ -20,6 +21,7 @@
         app:typeface="medium" />
 
     <br.com.wakim.autoescola.calendario.app.view.RobotoTextView
+        android:id="@android:id/text2"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         style="@style/Material.List.TextView.Secondary"

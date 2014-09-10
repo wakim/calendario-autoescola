@@ -8,10 +8,17 @@
         <item name="snackBarContainerStyle">@style/SnackBar.Container</item>
         <item name="snackBarTextStyle">@style/SnackBar.Message</item>
         <item name="snackBarButtonStyle">@style/SnackBar.Button</item>
+
+        <item name="actionDropDownStyle">@style/AppTheme.DropDownNav.Ab</item>
+        <item name="android:actionDropDownStyle">@style/AppTheme.DropDownNav.Ab</item>
     </style>
 
     <style name="AppTheme.OverlayedActionBar" parent="@style/AppTheme">
         <item name="windowActionBarOverlay">true</item>
         <item name="android:windowActionBarOverlay">true</item>
+    </style>
+
+    <style name="AppTheme.DropDownNav.Ab" parent="DropDownNav.Ab">
+        <item name="android:background">@drawable/spinner_background_ab</item>
     </style>
 </resources>

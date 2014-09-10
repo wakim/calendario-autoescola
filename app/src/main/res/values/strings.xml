@@ -49,6 +49,9 @@
     <string name="dia">Dia</string>
     <string name="semana">Semana</string>
 
+    <string name="ir_para_hoje">Ir para hoje</string>
+    <string name="escolher_data">Escolher data</string>
+
     <string name="hoje">Hoje</string>
     <string name="amanha">Amanhã</string>
     <string name="ontem">Ontem</string>
