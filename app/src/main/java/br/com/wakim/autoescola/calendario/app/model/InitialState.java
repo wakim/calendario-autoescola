@@ -22,7 +22,7 @@ public abstract class InitialState {
 
 	public static void persistIfNeeded(Context context) {
 
-		if(Disciplina.total() == 0) {
+		if(! Disciplina.tem()) {
 			for(String disciplina : context.getResources().getStringArray(R.array.disciplinas)) {
 				try {
 					persistDisciplina(disciplina);

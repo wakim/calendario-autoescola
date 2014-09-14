@@ -2,7 +2,6 @@ package br.com.wakim.autoescola.calendario.app.activity;
 
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
@@ -23,6 +22,7 @@ import br.com.wakim.autoescola.calendario.app.fragment.FragmentDialogAlert;
 import br.com.wakim.autoescola.calendario.app.fragment.FragmentEditDisciplina;
 import br.com.wakim.autoescola.calendario.app.fragment.FragmentSumarioAulas;
 import br.com.wakim.autoescola.calendario.app.model.Aula;
+import br.com.wakim.autoescola.calendario.app.model.task.AulaOperationAsyncTask;
 import br.com.wakim.autoescola.calendario.app.model.Disciplina;
 import br.com.wakim.autoescola.calendario.app.utils.ColorHelper;
 import br.com.wakim.autoescola.calendario.app.utils.Params;
@@ -31,10 +31,13 @@ import br.com.wakim.autoescola.calendario.app.utils.Params;
  * Created by wakim on 14/08/14.
  */
 public class DisciplinaActivity extends BaseActivity
-	implements FragmentEditDisciplina.DisciplinaCallback, DetalhesDisciplinaCallback {
+	implements FragmentEditDisciplina.DisciplinaCallback, DetalhesDisciplinaCallback, FragmentDialogAlert.DialogListener {
+
+	AulaOperationAsyncTask mAulaOperationAsyncTask;
 
 	FragmentDetalhesDisciplina mDetalhesDisciplina;
 	FragmentSumarioAulas mSumarioAulas;
+	FragmentDialogAlert mDialog;
 
 	Disciplina mDisciplina;
 
@@ -47,11 +50,21 @@ public class DisciplinaActivity extends BaseActivity
 	protected void onDestroy() {
 		super.onDestroy();
 
+		if(mDialog != null) {
+			mDialog.setDialogListener(null);
+		}
+
+		if(mAulaOperationAsyncTask != null) {
+			mAulaOperationAsyncTask.setPostOperation(null);
+		}
+
 		mDisciplina = null;
 
 		mDetalhesDisciplina = null;
 		mSumarioAulas = null;
 		mTopBackground = null;
+		mDialog = null;
+		mAulaOperationAsyncTask = null;
 	}
 
 	@Override
@@ -91,6 +104,12 @@ public class DisciplinaActivity extends BaseActivity
 		} else {
 			if(savedInstanceState.getBoolean(Params.PUSHED_TO_TOP, false)) {
 				setTitle(mDisciplina.getNome());
+			}
+
+			mDialog = (FragmentDialogAlert) fm.findFragmentByTag(getString(R.string.alert_dialog_tag));
+
+			if(mDialog != null && mDialog.isVisible()) {
+				mDialog.setDialogListener(this);
 			}
 		}
 
@@ -200,27 +219,24 @@ public class DisciplinaActivity extends BaseActivity
 	}
 
 	void showDeleteDialog() {
-		FragmentDialogAlert alert = new FragmentDialogAlert(
-			this,
-			R.string.excluir_disciplina_title,
-			mDisciplina.getTotalAulasConcluidas() > 0 ? R.string.excluir_disciplina_com_presenca_message : R.string.excluir_disciplina_sem_presenca_message,
-			R.string.sim_caps,
-			R.string.nao_caps
-		);
 
-		alert.setDialogListener(new FragmentDialogAlert.DialogListener() {
-			@Override
-			public void onCancel() {}
+		if(mDialog == null) {
 
-			@Override
-			public void onConfirm() {
-				deleteDisciplina();
-			}
-		});
+			mDialog = new FragmentDialogAlert(
+					this,
+					R.string.excluir_disciplina_title,
+					mDisciplina.getTotalAulasConcluidas() > 0 ? R.string.excluir_disciplina_com_presenca_message : R.string.excluir_disciplina_sem_presenca_message,
+					R.string.sim_caps,
+					R.string.nao_caps
+			);
 
-		alert.setShowsDialog(true);
-		alert.setCancelable(true);
-		alert.show(getSupportFragmentManager(), getString(R.string.alert_dialog_tag));
+			mDialog.setShowsDialog(true);
+			mDialog.setCancelable(true);
+		}
+
+		mDialog.setDialogListener(this);
+
+		mDialog.show(getSupportFragmentManager(), getString(R.string.alert_dialog_tag));
 	}
 
 	void deleteDisciplina() {
@@ -302,23 +318,35 @@ public class DisciplinaActivity extends BaseActivity
 
 	@Override
 	public void onAulaConcluidaToggle(Aula aula) {
-		// TODO Fazer isso assincronamente.
-		aula.setConcluida(! aula.isConcluida());
-		aula.save();
+		mAulaOperationAsyncTask = new AulaOperationAsyncTask(aula, AulaOperationAsyncTask.Operation.CONCLUIDA_TOGGLE);
 
-		mDisciplina.saveAndCalculate();
+		aula.setDisciplina(mDisciplina);
 
-		getDetalhesDisciplina().setDisciplina(mDisciplina);
+		mAulaOperationAsyncTask.setPostOperation(new Runnable() {
+			@Override
+			public void run() {
+				getDetalhesDisciplina().setDisciplina(mDisciplina);
+			}
+		});
+
+		mAulaOperationAsyncTask.execute();
 	}
 
 	@Override
 	public void onAulaDeleted(Aula aula) {
-		// TODO Fazer isso assincronamente.
-		aula.delete();
 
-		mDisciplina.saveAndCalculate();
+		mAulaOperationAsyncTask = new AulaOperationAsyncTask(aula, AulaOperationAsyncTask.Operation.DELETE);
 
-		getDetalhesDisciplina().setDisciplina(mDisciplina);
+		aula.setDisciplina(mDisciplina);
+
+		mAulaOperationAsyncTask.setPostOperation(new Runnable() {
+			@Override
+			public void run() {
+				getDetalhesDisciplina().setDisciplina(mDisciplina);
+			}
+		});
+
+		mAulaOperationAsyncTask.execute();
 	}
 
 	void goToCalendar(Calendar calendar) {
@@ -376,5 +404,13 @@ public class DisciplinaActivity extends BaseActivity
 		} else {
 			popBackStack();
 		}
+	}
+
+	@Override
+	public void onCancel() {}
+
+	@Override
+	public void onConfirm() {
+		deleteDisciplina();
 	}
 }

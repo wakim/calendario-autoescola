@@ -83,7 +83,6 @@ public class AulasCursorAdapter extends SimpleCursorAdapter {
 		holder.data.setText(mDateFormat.format(cal.getTime()));
 
 		holder.check.setTag(R.layout.list_item_aula, cursor.getPosition());
-		//holder.delete.setTag(R.layout.list_item_aula, cursor.getPosition());
 
 		if(mNow.after(cal)) {
 			holder.check.setBackgroundResource(R.drawable.custom_late_check_toggle);

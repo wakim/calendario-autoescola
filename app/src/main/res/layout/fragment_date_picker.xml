@@ -20,7 +20,7 @@
         app:typeface="medium" />
 
     <DatePicker
-        android:id="@+id/date_picker"
+        android:id="@+id/fdp_date_picker"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:calendarViewShown="false"

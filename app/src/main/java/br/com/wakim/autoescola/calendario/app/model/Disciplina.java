@@ -1,14 +1,17 @@
 package br.com.wakim.autoescola.calendario.app.model;
 
+import android.database.Cursor;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.provider.BaseColumns;
 
+import com.activeandroid.ActiveAndroid;
 import com.activeandroid.Cache;
 import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
 import com.activeandroid.query.Select;
+import com.activeandroid.util.SQLiteUtils;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -158,6 +161,18 @@ public class Disciplina extends Model implements Parcelable {
 
 	public static int total() {
 		return new Select().from(Disciplina.class).count();
+	}
+
+	public static boolean tem() {
+		final Cursor cursor = Cache.openDatabase().rawQuery("SELECT EXISTS (SELECT 1 FROM disciplina)", null);
+
+		if (cursor != null) {
+			cursor.moveToFirst();
+
+			return cursor.getInt(0) != 0;
+		}
+
+		return false;
 	}
 
 	public Long saveAndCalculate() {

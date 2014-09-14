@@ -11,11 +11,13 @@
 
     <string name="nova_disciplina">Nova Disciplina</string>
     <string name="editar_disciplina">Editar Disciplina</string>
-    <string name="nome_da_disciplina">Nome da disciplina*</string>
+    <string name="nome_da_disciplina_requerido">Nome da disciplina*</string>
+    <string name="nome_da_disciplina">Nome da disciplina</string>
     <string name="simbolo">Símbolo</string>
     <string name="cor">Cor</string>
     <string name="selecione_uma_cor">Selecione uma cor</string>
     <string name="quantidade_de_aulas">Quantidade de aulas*</string>
+    <string name="fechar_caps">FECHAR</string>
     <string name="cancelar_caps">CANCELAR</string>
     <string name="voltar_caps">VOLTAR</string>
     <string name="ok_caps">OK</string>
@@ -55,6 +57,10 @@
     <string name="hoje">Hoje</string>
     <string name="amanha">Amanhã</string>
     <string name="ontem">Ontem</string>
+    <string name="data">Data</string>
+    <string name="aulas_concluidas">Aulas Concluídas</string>
+    <string name="aulas_restantes">Aulas Restantes</string>
+    <string name="detalhes_da_aula">Detalhes da Aula</string>
 
     <string-array name="periodo">
         <item>Ontem</item>

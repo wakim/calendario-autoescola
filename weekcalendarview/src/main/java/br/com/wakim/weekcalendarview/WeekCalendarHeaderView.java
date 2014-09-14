@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.text.TextPaint;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 
 import java.util.TimeZone;
@@ -116,12 +117,12 @@ public class WeekCalendarHeaderView extends View {
 	void init(Context context, AttributeSet attrs, int defStyle) {
 
 		if(attrs != null) {
-			TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.WeekCalendarView, defStyle, 0);
+			TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.WeekCalendarHeaderView, defStyle, 0);
 
 			mTwoLineHeader = a.getBoolean(R.styleable.WeekCalendarHeaderView_two_line_header, true);
 			mAbbreviateDays = a.getBoolean(R.styleable.WeekCalendarHeaderView_abreviate_days, true);
 
-			int textSize = a.getDimensionPixelSize(R.styleable.WeekCalendarHeaderView_preferred_font_size, 14);
+			int textSize = a.getDimensionPixelSize(R.styleable.WeekCalendarHeaderView_preferred_font_size, (int) (14f * context.getResources().getDisplayMetrics().density));
 
 			mTextPaint.setTextSize(textSize);
 
@@ -174,7 +175,6 @@ public class WeekCalendarHeaderView extends View {
 	@Override
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
-
 		drawVerticalDates(canvas, mOffsetX, mDays, mCellWidth, mCellHeight);
 	}
 

@@ -14,6 +14,8 @@ import br.com.wakim.autoescola.calendario.R;
 import br.com.wakim.autoescola.calendario.app.fragment.FragmentEditDisciplina;
 import br.com.wakim.autoescola.calendario.app.fragment.FragmentSumarioDisciplinas;
 import br.com.wakim.autoescola.calendario.app.model.Disciplina;
+import br.com.wakim.autoescola.calendario.app.model.task.AbstractOperationAsyncTask;
+import br.com.wakim.autoescola.calendario.app.model.task.DisciplinaOperationAsyncTask;
 import br.com.wakim.autoescola.calendario.app.utils.Params;
 
 /**
@@ -23,11 +25,28 @@ public class MainActivity extends BaseActivity
 	implements FragmentSumarioDisciplinas.SumarioDisciplinasCallback,
 		FragmentEditDisciplina.DisciplinaCallback {
 
+	DisciplinaOperationAsyncTask mDisciplinaOperationTask;
+
 	FragmentEditDisciplina mEditDisciplina;
 	FragmentSumarioDisciplinas mSumarioDisciplinas;
 	ViewGroup mSecondaryContainer;
 
 	boolean mIsTablet = false;
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+
+		if(mDisciplinaOperationTask != null) {
+			mDisciplinaOperationTask.setPostOperation(null);
+		}
+
+		mEditDisciplina = null;
+		mSumarioDisciplinas = null;
+		mSecondaryContainer = null;
+
+		mDisciplinaOperationTask = null;
+	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -155,7 +174,15 @@ public class MainActivity extends BaseActivity
 		d.setCor(cor);
 		d.setLimite(limiteAulas);
 
-		d.saveAndCalculate();
+		mDisciplinaOperationTask = new DisciplinaOperationAsyncTask(d, AbstractOperationAsyncTask.Operation.PERSIST);
+		mDisciplinaOperationTask.setPostOperation(new Runnable() {
+			@Override
+			public void run() {
+				getSupportFragmentManager().popBackStack();
+			}
+		});
+
+		mDisciplinaOperationTask.execute();
 	}
 
 	@Override

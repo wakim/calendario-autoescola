@@ -3,13 +3,16 @@ package br.com.wakim.weekcalendarview;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v4.view.GestureDetectorCompat;
+import android.text.Layout;
 import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
@@ -26,6 +29,8 @@ import java.util.TimeZone;
 
 import br.com.wakim.weekcalendarview.listener.OnDateClickListener;
 import br.com.wakim.weekcalendarview.listener.OnDateLongClickListener;
+import br.com.wakim.weekcalendarview.model.DropAction;
+import br.com.wakim.weekcalendarview.model.Event;
 import br.com.wakim.weekcalendarview.utils.ColorHelper;
 import br.com.wakim.weekcalendarview.utils.TextHelper;
 import br.com.wakim.weekcalendarview.utils.WidthHeight;
@@ -38,9 +43,9 @@ import hirondelle.date4j.DateTime;
 public class WeekCalendarView extends View implements GestureDetector.OnGestureListener, DraggableManager.OnDropAnimationListener {
 
 	static final int CELL_HEIGHT_MULTIPLIER = 5;
-	static final float FIRST_CELL_WIDTH_MULTIPLIER = 1.5f;
+	static final float FIRST_CELL_WIDTH_MULTIPLIER = 1.25f;
 
-	DateTime mHighlightedDate, mBaseDate, mStartDate, mEndDate;
+	DateTime mHighlightedDate, mBaseDate, mStartDate, mEndDate, mNow = DateTime.now(TimeZone.getDefault());
 
 	Map<DateTime, Event> mEvents;
 
@@ -197,13 +202,13 @@ public class WeekCalendarView extends View implements GestureDetector.OnGestureL
 			mEndHour = a.getInt(R.styleable.WeekCalendarView_endHour, 23);
 
 			mStripePaint.setColor(a.getColor(R.styleable.WeekCalendarView_stripe_color, 0xFFEEEEEE));
-			mLinePaint.setColor(a.getColor(R.styleable.WeekCalendarView_line_color, 0xFF000000));
+			mLinePaint.setColor(a.getColor(R.styleable.WeekCalendarView_line_color, 0xDDDDDDDD));
 
 			mDragEnabled = a.getBoolean(R.styleable.WeekCalendarView_drag_enabled, false);
 
 			calculateHoursCount();
 
-			float textSize = a.getDimensionPixelSize(R.styleable.WeekCalendarView_font_size, 14);
+			float textSize = a.getDimensionPixelSize(R.styleable.WeekCalendarView_font_size, (int) (14f * context.getResources().getDisplayMetrics().density));
 
 			mTextPaint.setTextSize(textSize * 0.75f);
 			mHoursPaint.setTextSize(textSize);
@@ -254,12 +259,12 @@ public class WeekCalendarView extends View implements GestureDetector.OnGestureL
 				height = suggestedHeight;
 			}
 		} else {
-			WidthHeight textBounds = TextHelper.measureText("MM", mHoursPaint); // Mede o maior texto de duas letras
+			WidthHeight textBounds = TextHelper.measureText("MM:MM", mHoursPaint); // Mede o maior texto de duas letras
 
 			mHoursTextWidth = textBounds.width;
 			mHoursTextHeight = textBounds.height;
 
-			height = (int) ((mHoursTextHeight * CELL_HEIGHT_MULTIPLIER) * (mHoursCount + 1)); // +1 para o cabecalho
+			height = (int) ((mHoursTextHeight * CELL_HEIGHT_MULTIPLIER) * mHoursCount);
 		}
 
 		calculateCellSizes(width, height);
@@ -346,22 +351,51 @@ public class WeekCalendarView extends View implements GestureDetector.OnGestureL
 
 	void drawHorizontalLinesWithHours(Canvas canvas, int horizontalCellsCount, float cellHeight, float firstColumnWidth, float canvasWidth) {
 		String hourText;
+
 		int hour = mStartHour;
+		int nowHour = mNow.getHour();
+
+		boolean singleDay = mDayCount == 1, dayNow = mBaseDate.isSameDayAs(mNow);
+		boolean now = false;
 
 		float y = getYOffset();
-		float textOffsetY = cellHeight * 0.25f;
+
+		float textOffsetY = cellHeight * (singleDay ? 0f : -0.25f);
 		float textOffsetX = firstColumnWidth * 0.9f;
 
+		canvas.drawLine(0, y, canvasWidth, y, mLinePaint);
+
 		for(int i = 0; i < horizontalCellsCount; ++i, y+= cellHeight, ++hour) {
-			hourText = (hour < 10 ? "0" : "") + hour;
+			hourText = formatHour(hour);
+
+			now = dayNow && nowHour == hour;
+
+			if(singleDay) {
+				hourText = hourText.concat(" - ").concat(formatHour(hour + 1 % 24));
+
+				if(now) {
+					hourText = hourText.concat("\n").concat(getContext().getString(R.string.agora));
+					mHoursPaint.setColor(Color.RED);
+				}
+			} else if(now) {
+				mHoursPaint.setColor(Color.RED);
+			}
 
 			if(i % 2 == 1) {
 				canvas.drawRect(0, y + 1, canvasWidth, y + cellHeight - 1, mStripePaint);
 			}
 
-			canvas.drawLine(0, y, canvasWidth, y, mLinePaint);
-			canvas.drawText(hourText, textOffsetX, y + textOffsetY, mHoursPaint);
+			if(! singleDay) {
+				canvas.drawLine(0, y, canvasWidth, y, mLinePaint);
+			}
+
+			TextHelper.drawText(hourText, canvas, mHoursPaint, textOffsetX, y + textOffsetY, firstColumnWidth, cellHeight, Layout.Alignment.ALIGN_NORMAL);
+			mHoursPaint.setColor(Color.BLACK);
 		}
+	}
+
+	String formatHour(int hour) {
+		return (hour < 10 ? "0" + hour : Integer.toString(hour)).concat(":00");
 	}
 
 	boolean drawEvents(Canvas canvas, float xOffset, float yOffset, float cellWidth, float cellHeight, boolean hasHighlitedEvent) {
@@ -384,6 +418,9 @@ public class WeekCalendarView extends View implements GestureDetector.OnGestureL
 		if(mTypeFace != null) {
 			eventTextPaint.setTypeface(mTypeFace);
 		}
+
+		RectF rect = new RectF();
+		float x2, y2;
 
 		for(DateTime date : mEvents.keySet()) {
 			if(! date.gteq(mStartDate) || ! date.lteq(mEndDate)) {
@@ -412,8 +449,13 @@ public class WeekCalendarView extends View implements GestureDetector.OnGestureL
 				TextHelper.sSizeCache.put(cacheKey, eventTextPaint.getTextSize());
 			}
 
-			canvas.drawRect(position.x, position.y, position.x + cellWidth, position.y + cellHeight, eventBackgroundPaint);
-			TextHelper.drawText(text, canvas, eventTextPaint, position.x, position.y, cellWidth, cellHeight);
+			x2 = position.x + cellWidth;
+			y2 = position.y + (cellHeight * event.getDuration());
+
+			rect.set(position.x, position.y, x2, y2);
+
+			canvas.drawRoundRect(rect, 10f, 10f, eventBackgroundPaint);
+			TextHelper.drawText(text, canvas, eventTextPaint, position.x, position.y, cellWidth, cellHeight * event.getDuration());
 
 			eventTextPaint.setTextSize(originalTextSize);
 		}
@@ -434,14 +476,11 @@ public class WeekCalendarView extends View implements GestureDetector.OnGestureL
 	}
 
 	void drawVerticalLinesWithDates(Canvas canvas, float firstColumnWidth, int verticalCellsCount, float cellWidth, float cellHeight, float canvasHeight) {
-		float originalTextSize = mTextPaint.getTextSize();
-		float x = firstColumnWidth; // Ignorando a primeira celula
+		float x = firstColumnWidth; // Ignorando a primeira coluna
 
 		for(int i = 0; i < verticalCellsCount; ++i, x += cellWidth) {
-			canvas.drawLine(x, 0, x, canvasHeight, mLinePaint);//cellHeight, x, canvasHeight, mLinePaint);
+			canvas.drawLine(x, 0, x, canvasHeight, mLinePaint);
 		}
-
-		mTextPaint.setTextSize(originalTextSize);
 	}
 
 	DateTime getDateForPosition(float x, float y) {
@@ -729,8 +768,6 @@ public class WeekCalendarView extends View implements GestureDetector.OnGestureL
 		calculateDaysCount();
 
 		resetHeaderRequestFlag();
-		configureHeaderValues();
-
 		requestLayout();
 	}
 
@@ -740,8 +777,6 @@ public class WeekCalendarView extends View implements GestureDetector.OnGestureL
 		calculateDaysCount();
 
 		resetHeaderRequestFlag();
-		configureHeaderValues();
-
 		requestLayout();
 	}
 
@@ -751,8 +786,6 @@ public class WeekCalendarView extends View implements GestureDetector.OnGestureL
 		calculateDaysCount();
 
 		resetHeaderRequestFlag();
-		configureHeaderValues();
-
 		requestLayout();
 	}
 
@@ -792,6 +825,10 @@ public class WeekCalendarView extends View implements GestureDetector.OnGestureL
 
 	public void setEvents(Map<DateTime, Event> events) {
 		mEvents = events;
+
+		// TODO Pensar como agregar os eventos
+		// Lembrar do Drag And Drop
+
 		invalidate();
 	}
 
@@ -845,7 +882,7 @@ public class WeekCalendarView extends View implements GestureDetector.OnGestureL
 		mHeader.setCellHeight(mCellHeight);
 		mHeader.setCellWidth(mCellWidth);
 		mHeader.setOffsetX(mFirstCellWidth);
-		mHeader.setTextWidthLimit(mFirstCellWidth * 3f);
+		mHeader.setTextWidthLimit(mDayCount == 1 ? mFirstCellWidth : mFirstCellWidth * 1.5f);
 
 		if(! mHeaderRequestedLayout) {
 			mHeader.requestLayout();
@@ -898,7 +935,13 @@ public class WeekCalendarView extends View implements GestureDetector.OnGestureL
 
 	void calculateCellSizes(float width, float height) {
 		mFirstCellWidth = (mHoursTextWidth * FIRST_CELL_WIDTH_MULTIPLIER);
-		mCellHeight = height / (mHoursCount + 1); // Cabecalho
+
+		// With only 1 day, we will draw hour like this: hh:00 - (hh+1):00
+		if(mDayCount == 1) {
+			mFirstCellWidth *= 1.5f;
+		}
+
+		mCellHeight = height / (mHoursCount);
 		mCellWidth = (width - mFirstCellWidth) / getColumnsCount();
 
 		mDraggableManager

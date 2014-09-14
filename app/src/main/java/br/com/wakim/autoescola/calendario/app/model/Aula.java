@@ -114,7 +114,7 @@ public class Aula extends Model implements Parcelable {
 		return recuperarNoPeriodo(null, date.getTime(), disciplinas);
 	}
 
-	static List<Aula> recuperarNoPeriodo(Long dataInicial, Long dataFinal, Disciplina... disciplinas) {
+	public static List<Aula> recuperarNoPeriodo(Long dataInicial, Long dataFinal, Disciplina... disciplinas) {
 		From from = new Select()
 			.from(Aula.class);
 

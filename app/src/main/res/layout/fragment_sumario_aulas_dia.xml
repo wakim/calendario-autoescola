@@ -23,7 +23,7 @@
             android:id="@+id/fsad_calendar_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:line_color="@color/black_87p"
+            app:line_color="@color/grey_500"
             app:stripe_color="@color/grey_200"
             app:font_size="16sp"
             app:drag_enabled="true" />

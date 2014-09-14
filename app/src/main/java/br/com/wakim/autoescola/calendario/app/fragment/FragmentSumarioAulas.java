@@ -19,7 +19,6 @@ import br.com.wakim.autoescola.calendario.R;
 import br.com.wakim.autoescola.calendario.app.adapter.AulasCursorAdapter;
 import br.com.wakim.autoescola.calendario.app.adapter.OnOptionClickListener;
 import br.com.wakim.autoescola.calendario.app.model.Aula;
-import br.com.wakim.autoescola.calendario.app.model.AulasAsyncTaskLoader;
 import br.com.wakim.autoescola.calendario.app.model.Disciplina;
 import br.com.wakim.autoescola.calendario.app.utils.Params;
 

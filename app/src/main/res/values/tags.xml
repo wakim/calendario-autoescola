@@ -4,10 +4,10 @@
     <string name="edit_disciplina_tag">edit_disciplina</string>
     <string name="ciplina_tag">edit_disciplina</string>
     <string name="detalhes_disciplina_tag">detalhes_disciplina</string>
+    <string name="detalhes_aula_tag">detalhes_aula</string>
     <string name="sumario_aulas_tag">sumario_aulas</string>
     <string name="alert_dialog_tag">alert_dialog</string>
     <string name="color_picker_dialog_tag">color_picker_dialog</string>
+    <string name="date_picker_dialog_tag">date_picker_dialog</string>
     <string name="sumario_aulas_dia_tag">sumario_aulas_dia</string>
-
-    <string name="child_swipe_tag">child_swipe</string>
 </resources>

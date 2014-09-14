@@ -1,7 +1,7 @@
 package br.com.wakim.weekcalendarview.listener;
 
-import br.com.wakim.weekcalendarview.DropAction;
-import br.com.wakim.weekcalendarview.Event;
+import br.com.wakim.weekcalendarview.model.DropAction;
+import br.com.wakim.weekcalendarview.model.Event;
 import hirondelle.date4j.DateTime;
 
 public interface OnDragListener {

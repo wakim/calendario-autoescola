@@ -63,7 +63,11 @@ public abstract class TextHelper {
 	}
 
 	public static void drawText(String text, Canvas canvas, TextPaint textPaint, float offsetX, float offsetY, float cellWidth, float cellHeight) {
-		StaticLayout staticLayout = new StaticLayout(text, textPaint, (int) cellWidth, Layout.Alignment.ALIGN_CENTER, 1.0f, 0.0f, false);
+		drawText(text, canvas, textPaint, offsetX, offsetY, cellWidth, cellHeight, Layout.Alignment.ALIGN_CENTER);
+	}
+
+	public static void drawText(String text, Canvas canvas, TextPaint textPaint, float offsetX, float offsetY, float cellWidth, float cellHeight, Layout.Alignment alignment) {
+		StaticLayout staticLayout = new StaticLayout(text, textPaint, (int) cellWidth, alignment, 1.0f, 0.0f, false);
 
 		canvas.save();
 		canvas.translate(offsetX + (cellWidth - staticLayout.getWidth()) / 2f, offsetY + (cellHeight - staticLayout.getHeight()) / 2f);

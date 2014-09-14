@@ -1,10 +1,7 @@
 package br.com.wakim.autoescola.calendario.app.activity;
 
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.util.Log;
@@ -14,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.BaseAdapter;
+import android.widget.TabWidget;
 import android.widget.TextView;
 
 import com.antonyt.infiniteviewpager.InfinitePagerAdapter;
@@ -25,6 +23,7 @@ import java.util.TimeZone;
 
 import br.com.wakim.autoescola.calendario.R;
 import br.com.wakim.autoescola.calendario.app.adapter.CalendarWeekAdapter;
+import br.com.wakim.autoescola.calendario.app.fragment.FragmentDialogDatePicker;
 import br.com.wakim.autoescola.calendario.app.fragment.FragmentSumarioAulasIntervalo;
 import br.com.wakim.autoescola.calendario.app.model.Aula;
 import br.com.wakim.autoescola.calendario.app.model.Disciplina;
@@ -37,7 +36,7 @@ import hirondelle.date4j.DateTime;
  * Created by wakim on 28/08/14.
  */
 public class CalendarioAulasActivity extends BaseActivity
-	implements ActionBar.OnNavigationListener, ViewPager.OnPageChangeListener {
+	implements ActionBar.OnNavigationListener, ViewPager.OnPageChangeListener, FragmentDialogDatePicker.DialogListener {
 
 	Disciplina mDisciplina;
 
@@ -52,6 +51,8 @@ public class CalendarioAulasActivity extends BaseActivity
 
 	InfiniteViewPager mViewPager;
 
+	FragmentDialogDatePicker mDatePicker;
+
 	int mVirtualCurrentPage = 0;
 	boolean mIsTablet = false;
 
@@ -61,10 +62,15 @@ public class CalendarioAulasActivity extends BaseActivity
 	protected void onDestroy() {
 		super.onDestroy();
 
+		if(mDatePicker != null) {
+			mDatePicker.setDialogListener(null);
+		}
+
 		mViewPager = null;
 
 		mDisciplina = null;
 		mDate = null;
+		mDatePicker = null;
 	}
 
 	@Override
@@ -87,11 +93,18 @@ public class CalendarioAulasActivity extends BaseActivity
 
 			mDate = CalendarHelper.convertDateToDateTime(currentDate);
 		} else {
-			Calendar currentDate = savedInstanceState.containsKey(Params.CURRENT_DATE) ? (Calendar) savedInstanceState.getSerializable(Params.CURRENT_DATE) : Calendar.getInstance();
+			mDate = savedInstanceState.containsKey(Params.CURRENT_DATE) ? (DateTime) savedInstanceState.getSerializable(Params.CURRENT_DATE) : DateTime.now(mTz);
 
 			mDisciplina = savedInstanceState.<Disciplina>getParcelable(Params.DISCIPLINA);
 			realCurrentPage = savedInstanceState.getInt(Params.CURRENT_PAGE);
-			mDate = CalendarHelper.convertDateToDateTime(currentDate);
+
+			mDatePicker = (FragmentDialogDatePicker) getSupportFragmentManager().findFragmentByTag(getString(R.string.date_picker_dialog_tag));
+
+			if(mDatePicker != null && mDatePicker.isVisible()) {
+				mDatePicker.setDialogListener(this);
+			}
+
+			mMode = (GridMode) savedInstanceState.getSerializable(Params.GRID_MODE);
 		}
 
 		mViewPager = (InfiniteViewPager) findViewById(R.id.aca_viewpager);
@@ -105,7 +118,7 @@ public class CalendarioAulasActivity extends BaseActivity
 
 		mVirtualCurrentPage = mViewPager.getVirtualCurrentItem();
 
-		updateDateElements();
+		updateDateElements(savedInstanceState == null);
 
 		ActionBar ab = getSupportActionBar();
 
@@ -113,7 +126,17 @@ public class CalendarioAulasActivity extends BaseActivity
 		ab.setListNavigationCallbacks(mSpinnerAdapter, this);
 	}
 
-	public void updateDateElements() {
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+
+		outState.putSerializable(Params.CURRENT_DATE, mDate);
+		outState.putSerializable(Params.GRID_MODE, mMode);
+		outState.putParcelable(Params.DISCIPLINA, mDisciplina);
+		outState.putInt(Params.CURRENT_PAGE, mViewPager.getCurrentItem());
+	}
+
+	public void updateDateElements(boolean scrollToDate) {
 		List<FragmentSumarioAulasIntervalo> fragments = mWeeksAdapter.getFragments(getSupportFragmentManager(), R.id.aca_viewpager);
 		int count = fragments.size();
 		int currentPage = mViewPager.getCurrentItem();
@@ -122,7 +145,6 @@ public class CalendarioAulasActivity extends BaseActivity
 		DateTime increment = mDate.plusDays(- mMode.getDays());
 
 		for(int i = 0; i < count; ++i, increment = increment.plusDays(mMode.getDays()), position = (position + 1) % count) {
-
 			FragmentSumarioAulasIntervalo frag = fragments.get(position);
 
 			if(frag.getBaseDate() == null || (frag.getBaseDate() != null && ! frag.getBaseDate().equals(increment))) {
@@ -132,9 +154,17 @@ public class CalendarioAulasActivity extends BaseActivity
 			if(frag.getGridMode() == null || (frag.getGridMode() != null && ! frag.getGridMode().equals(mMode))) {
 				frag.setGridMode(mMode);
 			}
+
+			if(scrollToDate && mDate.equals(increment)) {
+				frag.scrollToDate();
+			}
 		}
 
 		mSpinnerAdapter.notifyDataSetChanged();
+	}
+
+	public void updateDateElements() {
+		updateDateElements(false);
 	}
 
 	@Override
@@ -149,21 +179,6 @@ public class CalendarioAulasActivity extends BaseActivity
 		return super.onOptionsItemSelected(item);
 	}
 
-	public void onAulaDismissed(Aula aula) {
-		aula.delete();
-
-		mDisciplina = aula.getDisciplina();
-		mDisciplina.saveAndCalculate();
-	}
-
-	public void onAulaConcluidaToggle(Aula aula) {
-		aula.setConcluida(! aula.isConcluida());
-		aula.save();
-
-		mDisciplina = aula.getDisciplina();
-		mDisciplina.saveAndCalculate();
-	}
-
 	void updateMode(GridMode newMode) {
 		if(mMode == newMode) {
 			return;
@@ -175,15 +190,31 @@ public class CalendarioAulasActivity extends BaseActivity
 		updateDateElements();
 	}
 
-	void goToToday() {
-		DateTime today = DateTime.today(mTz);
-
-		mDate = today;
+	void goToDate(DateTime date) {
+		mDate = date;
 		updateDateElements();
+	}
+
+	void goToToday() {
+		goToDate(DateTime.today(mTz));
+	}
+
+	void showDatePicker() {
+		if(mDatePicker == null) {
+			mDatePicker = new FragmentDialogDatePicker();
+
+			mDatePicker.setShowsDialog(true);
+			mDatePicker.setCancelable(true);
+		}
+
+		mDatePicker.setDialogListener(this);
+		mDatePicker.show(getSupportFragmentManager(), getString(R.string.date_picker_dialog_tag));
 	}
 
 	@Override
 	public boolean onNavigationItemSelected(int i, long l) {
+
+		ActionBar ab = getSupportActionBar();
 
 		switch(i) {
 			case 0:
@@ -192,8 +223,11 @@ public class CalendarioAulasActivity extends BaseActivity
 				break;
 			case 2:
 				goToToday();
+				ab.setSelectedNavigationItem(mMode.ordinal());
 				break;
 			case 3:
+				showDatePicker();
+				ab.setSelectedNavigationItem(mMode.ordinal());
 				break;
 		}
 
@@ -215,6 +249,14 @@ public class CalendarioAulasActivity extends BaseActivity
 
 	@Override
 	public void onPageScrollStateChanged(int state) {}
+
+	@Override
+	public void onCancel() {}
+
+	@Override
+	public void onConfirm(DateTime date) {
+		goToDate(date);
+	}
 
 	public class GridModeSpinnerAdapter extends BaseAdapter {
 

@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <style name="Material"></style>
+
     <style name="Material.TextView.Body1" parent="@android:style/TextAppearance.Medium">
         <item name="android:textSize">@dimen/text_body1</item>
         <item name="android:layout_marginLeft">@dimen/margin_text</item>
@@ -105,5 +108,19 @@
         <item name="android:dropDownSelector">?android:selectableItemBackground</item>
         <item name="android:divider">@null</item>
         <item name="android:dividerHeight">0dp</item>
+    </style>
+
+    <style name="Material.Card">
+        <item name="android:layout_margin">@dimen/margin_card</item>
+        <item name="android:background">@drawable/card_ui_background_light</item>
+    </style>
+    
+    <style name="Material.SuplementalAction">
+        <item name="android:layout_width">@dimen/width_suplemental_action</item>
+        <item name="android:layout_height">@dimen/height_suplemental_action</item>
+        <item name="android:layout_marginLeft">@dimen/margin_dialog_bottom</item>
+        <item name="android:layout_marginStart">@dimen/margin_dialog_bottom</item>
+        <item name="android:layout_marginRight">@dimen/margin_dialog_bottom</item>
+        <item name="android:layout_marginEnd">@dimen/margin_dialog_bottom</item>
     </style>
 </resources>

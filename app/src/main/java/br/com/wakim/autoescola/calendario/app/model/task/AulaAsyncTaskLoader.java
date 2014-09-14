@@ -1,7 +1,9 @@
-package br.com.wakim.autoescola.calendario.app.model;
+package br.com.wakim.autoescola.calendario.app.model.task;
 
 import android.content.Context;
 import android.support.v4.content.AsyncTaskLoader;
+
+import com.activeandroid.Model;
 
 import java.util.Calendar;
 import java.util.HashMap;
@@ -9,74 +11,46 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
-import br.com.wakim.weekcalendarview.Event;
+import br.com.wakim.autoescola.calendario.app.model.Aula;
+import br.com.wakim.weekcalendarview.model.Event;
 import hirondelle.date4j.DateTime;
 
 /**
  * Created by wakim on 15/06/14.
  */
-public class AulasAsyncTaskLoader extends AsyncTaskLoader<Map<DateTime, Event>> {
+public class AulaAsyncTaskLoader extends AsyncTaskLoader<Aula> {
 
-	Map<DateTime, Event> mData;
-	DateTime mStartDate, mEndDate;
+	long mAulaId;
+	Aula mAula;
 
 	private static Integer sId = 0;
 
-	public AulasAsyncTaskLoader(Context context, DateTime startDate, DateTime endDate) {
+	public AulaAsyncTaskLoader(Context context, long aulaId) {
 		super(context);
 
-		mStartDate = startDate;
-		mEndDate = endDate;
+		mAulaId = aulaId;
 	}
 
 	/****************************************************/
 	/** (1) A task that performs the asynchronous load **/
 	/****************************************************/
 	@Override
-	public Map<DateTime, Event> loadInBackground() {
-
-		Map<DateTime, Event> aulas = new HashMap<DateTime, Event>();
-
-		if(mStartDate == null || mEndDate == null) {
-			return aulas;
-		}
-
-		TimeZone tz = TimeZone.getDefault();
-
-		DateTime startDate = mStartDate.getStartOfDay();
-		DateTime endDate = mEndDate.getEndOfDay();
-
-		List<Aula> listaAulas = Aula.recuperarNoPeriodo(startDate.getMilliseconds(tz), endDate.getMilliseconds(tz));
-		Calendar calendar = Calendar.getInstance();
-
-		for(Aula aula : listaAulas) {
-			calendar.setTimeInMillis(aula.getData());
-
-			int year = calendar.get(Calendar.YEAR);
-			int month = calendar.get(Calendar.MONTH) + 1;
-			int day = calendar.get(Calendar.DATE);
-			int hour = calendar.get(Calendar.HOUR);
-
-			DateTime dt = new DateTime(year, month, day, hour, 0, 0, 0);
-
-			aulas.put(dt, new DefaultEventImpl(dt, aula.getDisciplina().getSimbolo(), aula.getDisciplina().getCor(), aula.getId(), aula.getDisciplina().getId(), aula.getDisciplina().getNome()));
-		}
-
-		return aulas;
+	public Aula loadInBackground() {
+		return Model.load(Aula.class, mAulaId);
 	}
 
 	/********************************************************/
 	/** (2) Deliver the results to the registered listener **/
 	/********************************************************/
 	@Override
-	public void deliverResult(Map<DateTime, Event> data) {
+	public void deliverResult(Aula data) {
 		if(isReset()) {
 			releaseResources(data);
 			return;
 		}
 
-		Map<DateTime, Event> oldData = mData;
-		mData = data;
+		Aula oldData = mAula;
+		mAula = data;
 
 		if(isStarted()) {
 			super.deliverResult(data);
@@ -92,11 +66,11 @@ public class AulasAsyncTaskLoader extends AsyncTaskLoader<Map<DateTime, Event>> 
 	/*********************************************************/
 	@Override
 	protected void onStartLoading() {
-		if(mData != null) {
-			deliverResult(mData);
+		if(mAula != null) {
+			deliverResult(mAula);
 		}
 
-		if (takeContentChanged() || mData == null) {
+		if (takeContentChanged() || mAula == null) {
 			// When the observer detects a change, it should call onContentChanged()
 			// on the Loader, which will cause the next call to takeContentChanged()
 			// to return true. If this is ever the case (or if the current data is
@@ -112,7 +86,7 @@ public class AulasAsyncTaskLoader extends AsyncTaskLoader<Map<DateTime, Event>> 
 	}
 
 	@Override
-	public void onCanceled(Map<DateTime, Event> data) {
+	public void onCanceled(Aula data) {
 		releaseResources(data);
 	}
 
@@ -122,8 +96,8 @@ public class AulasAsyncTaskLoader extends AsyncTaskLoader<Map<DateTime, Event>> 
 
 		onStopLoading();
 
-		releaseResources(mData);
-		mData = null;
+		releaseResources(mAula);
+		mAula = null;
 	}
 
 	@Override
@@ -131,20 +105,19 @@ public class AulasAsyncTaskLoader extends AsyncTaskLoader<Map<DateTime, Event>> 
 		cancelLoad();
 	}
 
-	protected void releaseResources(Map<DateTime, Event> data) {
+	protected void releaseResources(Aula data) {
 		// For a simple List, there is nothing to do. For something like a Cursor, we
 		// would close it in this method. All resources associated with the Loader
 		// should be released here.
-
-		if(data != null) {
-			data.clear();
-		}
 	}
 
-	public void updateDates(DateTime startDate, DateTime endDate) {
-		mStartDate = startDate;
-		mEndDate = endDate;
+	public void updateId(long aulaId) {
+		mAulaId = aulaId;
+		onContentChanged();
+	}
 
+	public void refresh() {
+		mAula = null;
 		onContentChanged();
 	}
 }

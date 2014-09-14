@@ -1,11 +1,13 @@
 package br.com.wakim.autoescola.calendario.app.model;
 
+import java.io.Serializable;
+
 import hirondelle.date4j.DateTime;
 
 /**
  * Created by wakim on 31/08/14.
  */
-public enum GridMode {
+public enum GridMode implements Serializable {
 	DAY, WEEK;
 
 	public DateTime getStartDate(DateTime base) {

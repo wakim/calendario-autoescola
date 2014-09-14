@@ -12,7 +12,7 @@
     <dimen name="text_display3">54sp</dimen>
     <dimen name="text_dialog_body">18sp</dimen>
     <dimen name="text_headline">26sp</dimen>
-    <dimen name="text_button">16sp</dimen>
+    <dimen name="text_button">20sp</dimen>
 
     <dimen name="margin_dialog_body">24dp</dimen>
     <dimen name="margin_dialog_bottom">16dp</dimen>
@@ -29,8 +29,11 @@
     <dimen name="margin_right_fab">16dp</dimen>
     <dimen name="margin_bottom_fab">16dp</dimen>
     <dimen name="margin_separator_with_list_icon_icon">56dp</dimen>
+    <dimen name="margin_card">16dp</dimen>
 
     <dimen name="padding_left_list_title">24dp</dimen>
+    <dimen name="padding_card">16dp</dimen>
+    <dimen name="padding_text_button">16dp</dimen>
 
     <dimen name="height_two_line_item">36dp</dimen>
     <dimen name="height_two_line">72dp</dimen>
@@ -38,7 +41,7 @@
     <dimen name="height_text_button">36dp</dimen>
     <dimen name="height_list_icon">40dp</dimen>
     <dimen name="height_dialog_top_icon">56dp</dimen>
-
+    <dimen name="height_suplemental_action">32dp</dimen>
     <dimen name="height_spinner_item">48dp</dimen>
 
     <dimen name="tag_color_dot_size">12dp</dimen>
@@ -46,8 +49,7 @@
     <dimen name="width_text_button">56dp</dimen>
     <dimen name="width_list_icon">40dp</dimen>
     <dimen name="width_dialog_top_icon">56dp</dimen>
-
-    <dimen name="padding_text_button">16dp</dimen>
+    <dimen name="width_suplemental_action">32dp</dimen>
 
     <dimen name="color_round_size">56dp</dimen>
 

@@ -7,7 +7,7 @@ import com.activeandroid.Cache;
 
 import java.util.TimeZone;
 
-import br.com.wakim.weekcalendarview.Event;
+import br.com.wakim.weekcalendarview.model.Event;
 import hirondelle.date4j.DateTime;
 
 /**
@@ -61,6 +61,12 @@ public class DefaultEventImpl implements Event {
 		return date;
 	}
 
+	// Now, every event is 1 hour
+	@Override
+	public float getDuration() {
+		return 1f;
+	}
+
 	@Override
 	public void setDate(DateTime date) {
 		this.date = date;
@@ -76,6 +82,11 @@ public class DefaultEventImpl implements Event {
 
 	public String getNomeDisciplina() {
 		return nomeDisciplina;
+	}
+
+	@Override
+	public long getType() {
+		return idDisciplina;
 	}
 
 	@Override

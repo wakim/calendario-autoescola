@@ -1,8 +1,7 @@
 package br.com.wakim.autoescola.calendario.app.fragment;
 
 import android.app.Activity;
-import android.content.res.AssetManager;
-import android.content.res.XmlResourceParser;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -10,54 +9,56 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBarActivity;
 import android.text.Html;
-import android.util.Log;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.Map;
 import java.util.TimeZone;
 
 import br.com.wakim.autoescola.calendario.R;
-import br.com.wakim.autoescola.calendario.app.model.AulasAsyncTaskLoader;
+import br.com.wakim.autoescola.calendario.app.model.Aula;
 import br.com.wakim.autoescola.calendario.app.model.DefaultEventImpl;
 import br.com.wakim.autoescola.calendario.app.model.GridMode;
-import br.com.wakim.autoescola.calendario.app.utils.CalendarHelper;
+import br.com.wakim.autoescola.calendario.app.model.task.AulaOperationAsyncTask;
+import br.com.wakim.autoescola.calendario.app.model.task.AulasAsyncTaskLoader;
 import br.com.wakim.autoescola.calendario.app.utils.FontHelper;
 import br.com.wakim.autoescola.calendario.app.utils.Params;
-import br.com.wakim.weekcalendarview.DropAction;
-import br.com.wakim.weekcalendarview.Event;
 import br.com.wakim.weekcalendarview.WeekCalendarHeaderView;
 import br.com.wakim.weekcalendarview.WeekCalendarView;
+import br.com.wakim.weekcalendarview.listener.OnDateClickListener;
 import br.com.wakim.weekcalendarview.listener.OnDragListener;
+import br.com.wakim.weekcalendarview.model.DropAction;
+import br.com.wakim.weekcalendarview.model.Event;
+import br.com.wakim.weekcalendarview.utils.XY;
 import hirondelle.date4j.DateTime;
 
 /**
  * Created by wakim on 17/08/14.
  */
 public class FragmentSumarioAulasIntervalo extends Fragment
-	implements LoaderManager.LoaderCallbacks<Map<DateTime, Event>>, OnDragListener {
+	implements LoaderManager.LoaderCallbacks<Map<DateTime, Event>>, OnDragListener, OnDateClickListener, FragmentDialogAlert.DialogListener, DetalhesAulaCallback {
+
+	AulaOperationAsyncTask mAulaOperationAsyncTask;
 
 	AulasAsyncTaskLoader mLoader;
 	DateTime mBaseDate;
 
 	GridMode mMode;
-	boolean mModeChanged = false;
+	boolean mModeChanged = false, mScrollToDate = false;
 
 	WeekCalendarHeaderView mWeekCalendarHeaderView;
 	WeekCalendarView mWeekCalendarView;
 
 	DateFormat mDateFormat = DateFormat.getDateTimeInstance();
+
+	// If dialog of replace event is showing and orientation changed, lets store the events
+	Event mTargetEvent, mDraggedEvent;
+	FragmentDialogAlert mDialogReplacement;
+	FragmentDetalhesAula mDetalhesAula;
 
 	public static FragmentSumarioAulasIntervalo newInstance(DateTime baseDate, GridMode mode, int loaderIncrementId) {
 		Bundle bundle = new Bundle();
@@ -82,6 +83,14 @@ public class FragmentSumarioAulasIntervalo extends Fragment
 	public void onDestroyView() {
 		super.onDestroyView();
 
+		if(mDialogReplacement != null) {
+			mDialogReplacement.setDialogListener(null);
+		}
+
+		if(mAulaOperationAsyncTask != null) {
+			mAulaOperationAsyncTask.setPostOperation(null);
+		}
+
 		getLoaderManager().destroyLoader(Params.AULAS_DIA_LOADER_ID);
 		mLoader = null;
 	}
@@ -98,6 +107,9 @@ public class FragmentSumarioAulasIntervalo extends Fragment
 		if(savedInstanceState != null) {
 			mBaseDate = (DateTime) savedInstanceState.getSerializable(Params.CURRENT_DATE);
 			mMode = (GridMode) savedInstanceState.getSerializable(Params.GRID_MODE);
+
+			mTargetEvent = savedInstanceState.getParcelable(Params.TARGET_EVENT);
+			mDraggedEvent = savedInstanceState.getParcelable(Params.DRAGGED_EVENT);
 		}
 	}
 
@@ -112,6 +124,7 @@ public class FragmentSumarioAulasIntervalo extends Fragment
 		mWeekCalendarView.setHeader(mWeekCalendarHeaderView);
 
 		mWeekCalendarView.setOnDragListener(this);
+		mWeekCalendarView.setOnDateClickListener(this);
 
 		mWeekCalendarView.setTag(getTag());
 		mWeekCalendarHeaderView.setTag(getTag());
@@ -119,6 +132,21 @@ public class FragmentSumarioAulasIntervalo extends Fragment
 		mLoader = (AulasAsyncTaskLoader) getLoaderManager().initLoader(Params.AULAS_DIA_LOADER_ID, null, this);
 
 		((ActionBarActivity) getActivity()).setSupportProgressBarIndeterminateVisibility(true);
+
+		mDialogReplacement = (FragmentDialogAlert) getChildFragmentManager().findFragmentByTag(getString(R.string.alert_dialog_tag));
+
+		if(mDialogReplacement != null && mDialogReplacement.isVisible()) {
+			mDialogReplacement.setDialogListener(this);
+		}
+
+		view.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+			@Override
+			public boolean onPreDraw() {
+				getView().getViewTreeObserver().removeOnPreDrawListener(this);
+				internalScrollToDate();
+				return true;
+			}
+		});
 
 		return view;
 	}
@@ -140,6 +168,8 @@ public class FragmentSumarioAulasIntervalo extends Fragment
 		mWeekCalendarHeaderView.setTwoLineHeader(mMode == GridMode.WEEK);
 
 		mWeekCalendarView.setDates(mBaseDate, mMode.getStartDate(mBaseDate), mMode.getEndDate(mBaseDate));
+
+		internalScrollToDate();
 	}
 
 	@Override
@@ -158,6 +188,9 @@ public class FragmentSumarioAulasIntervalo extends Fragment
 
 		outState.putSerializable(Params.CURRENT_DATE, mBaseDate);
 		outState.putSerializable(Params.GRID_MODE, mMode);
+
+		outState.putParcelable(Params.TARGET_EVENT, mTargetEvent);
+		outState.putParcelable(Params.DRAGGED_EVENT, mDraggedEvent);
 	}
 
 	public void setGridMode(GridMode mode) {
@@ -232,6 +265,10 @@ public class FragmentSumarioAulasIntervalo extends Fragment
 
 	@Override
 	public boolean onStopDrag(Event event, DateTime date) {
+		new AulaOperationAsyncTask(((DefaultEventImpl) event).getIdAula(), AulaOperationAsyncTask.Operation.UPDATE_DATE)
+			.setDate(date.getMilliseconds(TimeZone.getDefault()))
+			.execute();
+
 		return true;
 	}
 
@@ -246,33 +283,28 @@ public class FragmentSumarioAulasIntervalo extends Fragment
 		String dataFormatada = mDateFormat.format(date);
 		String nomeAulaSubstituta = ((DefaultEventImpl) aulaSubstituta).getNomeDisciplina();
 		String nomeAulaAlvo = ((DefaultEventImpl) aulaAlvo).getNomeDisciplina();
-
 		String message = getString(R.string.substituir_aula_message, nomeAulaSubstituta, dataFormatada, nomeAulaAlvo);
 
-		FragmentDialogAlert alert = new FragmentDialogAlert(
-				getActivity(),
-				getString(R.string.substituir_aula_title),
-				Html.fromHtml(message),
-				getString(R.string.sim_caps),
-				getString(R.string.nao_caps)
-		);
+		mDraggedEvent = aulaSubstituta;
+		mTargetEvent = aulaAlvo;
 
-		alert.setDialogListener(new FragmentDialogAlert.DialogListener() {
-			@Override
-			public void onCancel() {
-				mWeekCalendarView.revertEventDrop(aulaSubstituta);
-			}
+		if(mDialogReplacement == null) {
+			mDialogReplacement = new FragmentDialogAlert(
+					getString(R.string.substituir_aula_title),
+					Html.fromHtml(message),
+					getString(R.string.sim_caps),
+					getString(R.string.nao_caps)
+			);
 
-			@Override
-			public void onConfirm() {
-				aulaSubstituta.setDate(aulaAlvo.getDate());
-				mWeekCalendarView.commitEventDrop(aulaSubstituta);
-			}
-		});
+			mDialogReplacement.setShowsDialog(true);
+			mDialogReplacement.setCancelable(true);
+		} else {
+			mDialogReplacement.getArguments().putCharSequence(Params.DIALOG_MESSAGE, Html.fromHtml(message));
+		}
 
-		alert.setShowsDialog(true);
-		alert.setCancelable(true);
-		alert.show(getChildFragmentManager(), getString(R.string.alert_dialog_tag));
+		mDialogReplacement.setDialogListener(this);
+
+		mDialogReplacement.show(getChildFragmentManager(), getString(R.string.alert_dialog_tag));
 	}
 
 	public DateTime getBaseDate() {
@@ -281,5 +313,113 @@ public class FragmentSumarioAulasIntervalo extends Fragment
 
 	public GridMode getGridMode() {
 		return mMode;
+	}
+
+	@Override
+	public void onDateClicked(DateTime date) {
+	}
+
+	@Override
+	public void onDateClicked(DateTime date, Event event) {
+		DefaultEventImpl dEvent = (DefaultEventImpl) event;
+
+		if(mDetalhesAula == null) {
+			mDetalhesAula = new FragmentDetalhesAula(getActivity(), dEvent.getIdAula());
+
+			mDetalhesAula.setShowsDialog(true);
+			mDetalhesAula.setCancelable(true);
+		} else {
+			mDetalhesAula.getArguments().putLong(Params.AULA, dEvent.getIdAula());
+		}
+
+		mDetalhesAula.setDetalhesAulaCallback(this);
+
+		mDetalhesAula.show(getChildFragmentManager(), getString(R.string.detalhes_aula_tag));
+	}
+
+	@Override
+	public void onCancel() {
+		mWeekCalendarView.revertEventDrop(mDraggedEvent);
+
+		mDraggedEvent = null;
+		mTargetEvent = null;
+	}
+
+	@Override
+	public void onConfirm() {
+		mDraggedEvent.setDate(mTargetEvent.getDate());
+		mWeekCalendarView.commitEventDrop(mDraggedEvent);
+
+		new AulaOperationAsyncTask(((DefaultEventImpl) mDraggedEvent).getIdAula(), AulaOperationAsyncTask.Operation.UPDATE_DATE)
+			.setDate(mDraggedEvent.getDate().getMilliseconds(TimeZone.getDefault()))
+			.execute();
+
+		mAulaOperationAsyncTask = new AulaOperationAsyncTask(((DefaultEventImpl) mTargetEvent).getIdAula(), AulaOperationAsyncTask.Operation.DELETE);
+
+		mAulaOperationAsyncTask.setPostOperation(new Runnable() {
+			@Override
+			public void run() {
+				mLoader.onContentChanged();
+			}
+		});
+
+		mAulaOperationAsyncTask.execute();
+
+		mDraggedEvent = null;
+		mTargetEvent = null;
+	}
+
+	@Override
+	public void onAulaConcluidaToggle(Aula aula) {
+		mAulaOperationAsyncTask = new AulaOperationAsyncTask(aula, AulaOperationAsyncTask.Operation.CONCLUIDA_TOGGLE);
+
+		mAulaOperationAsyncTask.setPostOperation(new Runnable() {
+			@Override
+			public void run() {
+				if(mDetalhesAula != null) {
+					mDetalhesAula.updateAula();
+				}
+			}
+		});
+
+		mAulaOperationAsyncTask.execute();
+	}
+
+	@Override
+	public void onAulaDeleted(Aula aula) {
+		mAulaOperationAsyncTask = new AulaOperationAsyncTask(aula, AulaOperationAsyncTask.Operation.DELETE);
+
+		mAulaOperationAsyncTask.setPostOperation(new Runnable() {
+			@Override
+			public void run() {
+				mLoader.onContentChanged();
+			}
+		});
+
+		mAulaOperationAsyncTask.execute();
+	}
+
+	void internalScrollToDate() {
+		if(mScrollToDate && mWeekCalendarView != null) {
+			XY scrollPosition;
+
+			if(mBaseDate.getHour() == 0) {
+				mScrollToDate = false;
+				return;
+			}
+
+			if((scrollPosition = mWeekCalendarView.getDatePosition(mBaseDate)).y > 0) {
+				((View) mWeekCalendarView.getParent()).scrollTo(0, (int) scrollPosition.y);
+				mScrollToDate = false;
+			}
+		}
+	}
+
+	public void scrollToDate() {
+		if(mWeekCalendarView != null) {
+			internalScrollToDate();
+		} else {
+			mScrollToDate = true;
+		}
 	}
 }

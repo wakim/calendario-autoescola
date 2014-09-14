@@ -7,7 +7,8 @@ public abstract class Params {
 
 	public static final int DISCIPLINA_LOADER_ID = 1,
 							AULAS_LOADER_ID = 2,
-							AULAS_DIA_LOADER_ID = 3;
+							AULA_LOADER_ID = 3,
+							AULAS_DIA_LOADER_ID = 4;
 
 	public static final String DISCIPLINA = "DISCIPLINA",
 							   COLOR_LAYOUT_VISIBLE = "COLOR_LAYOUT_VISIBLE",
@@ -16,6 +17,9 @@ public abstract class Params {
 							   EDITING_DISCIPLINA = "EDITING_DISCIPLINA",
 							   CURRENT_DATE = "CURRENT_DATE",
 							   GRID_MODE = "GRID_MODE",
+							   AULA = "AULA",
+							   TARGET_EVENT = "TARGET_EVENT",
+							   DRAGGED_EVENT = "DRAGGED_EVENT",
 							   CURRENT_PAGE = "CURRENT_PAGE";
 
 	public static final String DIALOG_TITLE = "DIALOG_TITLE",

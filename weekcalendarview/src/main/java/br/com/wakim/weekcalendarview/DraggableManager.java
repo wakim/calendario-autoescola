@@ -8,6 +8,7 @@ import android.text.TextPaint;
 import android.view.View;
 import android.view.ViewGroup;
 
+import br.com.wakim.weekcalendarview.model.Event;
 import br.com.wakim.weekcalendarview.utils.TextHelper;
 import br.com.wakim.weekcalendarview.utils.XY;
 
@@ -151,13 +152,15 @@ public class DraggableManager {
 		}
 
 		float x = mX + mOffsetX, y = mY + mOffsetY;
+		float x2 = x + mCellWidth;
+		float y2 = y + (mCellHeight * mEvent.getDuration());
 
-		RectF shadowRect = new RectF(x - DX, y + DY, x + mCellWidth - DX, y + mCellHeight + DY);
+		RectF shadowRect = new RectF(x - DX, y + DY, x2 - DX, y2 + DY);
 
 		canvas.drawRoundRect(shadowRect, SHADOW_RADIUS, SHADOW_RADIUS, mShadowPaint);
-		canvas.drawRect(x, y, x + mCellWidth, y + mCellHeight, mBackgroundPaint);
+		canvas.drawRect(x, y, x2, y2, mBackgroundPaint);
 
-		TextHelper.drawText(mText, canvas, mTextPaint, mX + mOffsetX, mY + mOffsetY, mCellWidth, mCellHeight);
+		TextHelper.drawText(mText, canvas, mTextPaint, x, y, mCellWidth, mCellHeight * mEvent.getDuration());
 
 		if(mAnimationRunnable != null) {
 			mAnimationRunnable.postDelayed();

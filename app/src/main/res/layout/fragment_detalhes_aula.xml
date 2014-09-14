@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/card_ui_background_light">
+
+    <br.com.wakim.autoescola.calendario.app.view.RobotoTextView
+        android:id="@android:id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/Material.TextView.Title"
+        android:text="@string/detalhes_da_aula"
+        android:layout_marginBottom="@dimen/margin_text"
+        android:paddingLeft="@dimen/margin_dialog_body"
+        android:paddingRight="@dimen/margin_dialog_body"
+        android:paddingTop="@dimen/margin_dialog_body"
+        app:typeface="regular" />
+
+    <ScrollView
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/margin_dialog_body"
+            android:layout_marginRight="@dimen/margin_dialog_body">
+
+            <br.com.wakim.autoescola.calendario.app.view.RobotoTextView
+                android:id="@+id/fda_label_nome"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/Material.Dialog.TextView.Body1"
+                android:text="@string/nome_da_disciplina"
+                app:typeface="medium" />
+
+            <br.com.wakim.autoescola.calendario.app.view.RobotoTextView
+                android:id="@+id/fda_nome"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/Material.Dialog.TextView.Body2"
+                android:text="Legislação de Trânsito"
+                app:typeface="medium" />
+
+            <br.com.wakim.autoescola.calendario.app.view.RobotoTextView
+                android:id="@+id/fda_label_data"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/Material.Dialog.TextView.Body1"
+                android:layout_marginTop="@dimen/margin_text"
+                android:text="@string/data"
+                app:typeface="medium" />
+
+            <br.com.wakim.autoescola.calendario.app.view.RobotoTextView
+                android:id="@+id/fda_data"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/Material.Dialog.TextView.Body2"
+                android:text="11/09/2014 16:24:00"
+                app:typeface="medium" />
+
+            <br.com.wakim.autoescola.calendario.app.view.RobotoTextView
+                android:id="@+id/fda_label_aulas_concluidas"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/Material.Dialog.TextView.Body1"
+                android:layout_marginTop="@dimen/margin_text"
+                android:text="@string/aulas_concluidas"
+                app:typeface="medium" />
+
+            <br.com.wakim.autoescola.calendario.app.view.RobotoTextView
+                android:id="@+id/fda_aulas_concluidas"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/Material.Dialog.TextView.Body2"
+                android:text="10"
+                app:typeface="medium" />
+
+        <br.com.wakim.autoescola.calendario.app.view.RobotoTextView
+                android:id="@+id/fda_label_aulas_restantes"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/Material.Dialog.TextView.Body1"
+                android:layout_marginTop="@dimen/margin_text"
+                android:text="@string/aulas_restantes"
+                app:typeface="medium" />
+
+            <br.com.wakim.autoescola.calendario.app.view.RobotoTextView
+                android:id="@+id/fda_aulas_restantes"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/Material.Dialog.TextView.Body2"
+                android:text="6"
+                app:typeface="medium" />
+        </LinearLayout>
+    </ScrollView>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/margin_dialog_bottom"
+        android:layout_weight="1">
+
+        <ImageView
+            android:id="@+id/fda_delete"
+            style="@style/Material.SuplementalAction"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="0dp"
+            android:layout_marginStart="0dp"
+            android:layout_marginRight="0dp"
+            android:layout_marginEnd="0dp"
+            android:src="@drawable/ic_delete_light" />
+
+        <ToggleButton
+            android:id="@+id/fda_check"
+            style="@style/Material.SuplementalAction"
+            android:layout_gravity="center_vertical"
+            android:textOn="@null"
+            android:textOff="@null"
+            android:background="@drawable/custom_check_toggle" />
+
+        <br.com.wakim.autoescola.calendario.app.view.RobotoTextView
+            android:id="@android:id/button1"
+            style="@style/Material.TextView.Button"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/height_text_button"
+            android:layout_marginLeft="@dimen/margin_dialog_bottom"
+            android:layout_marginStart="@dimen/margin_dialog_bottom"
+            android:gravity="center_vertical"
+            android:layout_gravity="center"
+            android:text="@string/fechar_caps"
+            app:typeface="medium" />
+    </LinearLayout>
+</LinearLayout>

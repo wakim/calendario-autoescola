@@ -2,6 +2,8 @@
 
     <string name="app_name">Week Calendar View</string>
 
+    <string name="agora">AGORA</string>
+
     <string-array name="wc__days">
         <item>Domingo</item>
         <item>Segunda</item>

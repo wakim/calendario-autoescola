@@ -1,4 +1,4 @@
-package br.com.wakim.weekcalendarview;
+package br.com.wakim.weekcalendarview.model;
 
 /**
  * Created by wakim on 05/09/14.

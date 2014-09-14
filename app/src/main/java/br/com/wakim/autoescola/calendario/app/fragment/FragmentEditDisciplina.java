@@ -45,6 +45,10 @@ public class FragmentEditDisciplina extends Fragment implements View.OnClickList
 
 		mSnackBar.destroy();
 
+		if(mColorPicker != null) {
+			mColorPicker.setDialogListener(null);
+		}
+
 		mName = mSymbol = mLimit = null;
 		mColor = null;
 		mDataLayout = null;
@@ -110,6 +114,12 @@ public class FragmentEditDisciplina extends Fragment implements View.OnClickList
 			}
 		}
 
+		mColorPicker = (FragmentDialogColorPicker) getChildFragmentManager().findFragmentByTag(getString(R.string.alert_dialog_tag));
+
+		if(mColorPicker != null && mColorPicker.isVisible()) {
+			mColorPicker.setDialogListener(this);
+		}
+
 		if(mDisciplina != null) {
 			mName.append(mDisciplina.getNome());
 			mSymbol.append(mDisciplina.getSimbolo());
@@ -119,14 +129,12 @@ public class FragmentEditDisciplina extends Fragment implements View.OnClickList
 			}
 		}
 
-		//ColorHelper.configureColor(mColor, mCor);
+		ColorHelper.configureColor(mColor, mCor);
 
 		mSnackBar = new SnackBar(getActivity());
 
 		return view;
 	}
-
-
 
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -210,12 +218,14 @@ public class FragmentEditDisciplina extends Fragment implements View.OnClickList
 	}
 
 	void openColorPickerDialog() {
-		mColorPicker = new FragmentDialogColorPicker(mCor);
+		if(mColorPicker == null) {
+			mColorPicker = new FragmentDialogColorPicker(mCor);
 
-		mColorPicker.setShowsDialog(true);
-		mColorPicker.setCancelable(true);
+			mColorPicker.setShowsDialog(true);
+			mColorPicker.setCancelable(true);
+		}
+
 		mColorPicker.setDialogListener(this);
-
 		mColorPicker.show(getChildFragmentManager(), getString(R.string.color_picker_dialog_tag));
 	}
 

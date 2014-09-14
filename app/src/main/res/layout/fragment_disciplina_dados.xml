@@ -20,7 +20,7 @@
         style="@style/Material.EditText.Body1"
         android:layout_marginLeft="0dp"
         android:layout_marginStart="0dp"
-        android:hint="@string/nome_da_disciplina"
+        android:hint="@string/nome_da_disciplina_requerido"
         app:typeface="medium" />
 
     <br.com.wakim.autoescola.calendario.app.view.RobotoEditText
