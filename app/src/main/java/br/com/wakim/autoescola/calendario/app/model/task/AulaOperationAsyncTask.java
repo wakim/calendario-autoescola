@@ -1,31 +1,26 @@
 package br.com.wakim.autoescola.calendario.app.model.task;
 
-import android.os.AsyncTask;
-
 import br.com.wakim.autoescola.calendario.app.model.Aula;
 
 /**
  * Created by wakim on 13/09/14.
  */
-public class AulaOperationAsyncTask extends AbstractOperationAsyncTask<Void, Void, Void> {
+public class AulaOperationAsyncTask extends AbstractOperationAsyncTask<Aula, Void, Void, Void> {
 
 	Long mAulaId;
-	Aula mAula;
-
 	long mDate;
 
 	public AulaOperationAsyncTask(Aula aula, Operation op) {
-		super(op);
-		mAula = aula;
+		super(aula, op);
 	}
 
 	public AulaOperationAsyncTask(long aulaId, Operation op) {
-		super(op);
+		super(null, op);
 		mAulaId = aulaId;
 	}
 
 	public AulaOperationAsyncTask setAula(Aula aula) {
-		mAula = aula;
+		mResource = aula;
 		return this;
 	}
 
@@ -43,8 +38,8 @@ public class AulaOperationAsyncTask extends AbstractOperationAsyncTask<Void, Voi
 	protected Void doInBackground(Void... params) {
 		super.doInBackground(params);
 
-		if(mAula == null && mAulaId != null) {
-			mAula = Aula.load(Aula.class, mAulaId);
+		if(mResource == null && mAulaId != null) {
+			mResource = Aula.load(Aula.class, mAulaId);
 		}
 
 		switch(mOp) {
@@ -57,33 +52,36 @@ public class AulaOperationAsyncTask extends AbstractOperationAsyncTask<Void, Voi
 			case UPDATE_DATE:
 				updateDate();
 				break;
+			case PERSIST:
+				persist();
 		}
 
 		return null;
 	}
 
 	void updateDate() {
-		mAula.setData(mDate);
-		mAula.save();
+		mResource.setData(mDate);
+		mResource.save();
 	}
 
 	void delete() {
-		mAula.delete();
-		mAula.getDisciplina().saveAndCalculate();
+		mResource.delete();
+		mResource.getDisciplina().saveAndCalculate();
 	}
 
 	void concluidaToggle() {
-		mAula.setConcluida(! mAula.isConcluida());
-		mAula.save();
+		mResource.setConcluida(! mResource.isConcluida());
+		mResource.save();
 
-		mAula.getDisciplina().saveAndCalculate();
+		mResource.getDisciplina().saveAndCalculate();
 	}
 
-	@Override
-	protected void onPostExecute(Void aVoid) {
-		super.onPostExecute(aVoid);
+	void persist() {
+		mResource.save();
+		mResource.getDisciplina().saveAndCalculate();
+	}
 
-		mPostOperation = null;
-		mAula = null;
+	public Aula getAula() {
+		return mResource;
 	}
 }

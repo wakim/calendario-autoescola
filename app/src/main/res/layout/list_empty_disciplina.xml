@@ -23,7 +23,7 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginBottom="16dp"
         android:layout_marginTop="16dp"
-        app:drawable="@drawable/ic_add_fab_dark"
+        app:drawable="@drawable/ic_fab_add_dark"
         app:color="@color/fab" />
 
     <br.com.wakim.autoescola.calendario.app.view.RobotoTextView

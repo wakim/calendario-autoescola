@@ -96,7 +96,7 @@
         android:layout_marginTop="@dimen/neg_half_fab_size"
         android:layout_below="@id/fdd_header"
         android:layout_alignParentRight="true"
-        app:drawable="@drawable/ic_add_fab_light"
+        app:drawable="@drawable/ic_fab_add_light"
         app:color="@color/white" />
 
 </RelativeLayout>

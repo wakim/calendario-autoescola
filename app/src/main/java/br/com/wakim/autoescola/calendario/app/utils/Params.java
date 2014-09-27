@@ -20,10 +20,13 @@ public abstract class Params {
 							   AULA = "AULA",
 							   TARGET_EVENT = "TARGET_EVENT",
 							   DRAGGED_EVENT = "DRAGGED_EVENT",
-							   CURRENT_PAGE = "CURRENT_PAGE";
+							   CURRENT_PAGE = "CURRENT_PAGE",
+							   BATCH_INSERT_MODE = "BATCH_INSERT_MODE",
+							   ADD_AULA_MODE = "ADD_AULA_MODE";
 
 	public static final String DIALOG_TITLE = "DIALOG_TITLE",
 							   DIALOG_MESSAGE = "DIALOG_MESSAGE",
 							   DIALOG_BUTTON1 = "DIALOG_BUTTON1",
-							   DIALOG_BUTTON2 = "DIALOG_BUTTON2";
+							   DIALOG_BUTTON2 = "DIALOG_BUTTON2",
+							   DIALOG_PARAM = "DIALOG_PARAM";
 }

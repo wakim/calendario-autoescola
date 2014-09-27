@@ -3,6 +3,8 @@ package br.com.wakim.autoescola.calendario.app.activity;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -11,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import br.com.wakim.autoescola.calendario.R;
+import br.com.wakim.autoescola.calendario.app.adapter.ProximasAulasAdapter;
 import br.com.wakim.autoescola.calendario.app.fragment.FragmentEditDisciplina;
 import br.com.wakim.autoescola.calendario.app.fragment.FragmentSumarioDisciplinas;
 import br.com.wakim.autoescola.calendario.app.model.Disciplina;
@@ -60,8 +63,7 @@ public class MainActivity extends BaseActivity
 		FragmentManager fm = getSupportFragmentManager();
 
 		if(savedInstanceState == null) {
-			FragmentSumarioDisciplinas sumarioDisciplinas = new FragmentSumarioDisciplinas();
-			fm.beginTransaction().add(R.id.am_main_fragment, sumarioDisciplinas).commit();
+			fm.beginTransaction().add(R.id.am_main_fragment, new FragmentSumarioDisciplinas()).commit();
 		} else {
 			if(mSecondaryContainer != null && savedInstanceState.getBoolean(Params.EDITING_DISCIPLINA, false)) {
 				mSecondaryContainer.setVisibility(View.VISIBLE);
@@ -88,6 +90,13 @@ public class MainActivity extends BaseActivity
 
 		setTitle(R.string.disciplinas);
 		setTitlePadding(getResources().getDimensionPixelSize(R.dimen.padding_left_list_title));
+
+		findViewById(android.R.id.content).postDelayed(new Runnable() {
+			@Override
+			public void run() {
+				startActivity(new Intent(MainActivity.this, ProximasAulasActivity.class));
+			}
+		}, 100);
 	}
 
 	@Override
@@ -175,9 +184,9 @@ public class MainActivity extends BaseActivity
 		d.setLimite(limiteAulas);
 
 		mDisciplinaOperationTask = new DisciplinaOperationAsyncTask(d, AbstractOperationAsyncTask.Operation.PERSIST);
-		mDisciplinaOperationTask.setPostOperation(new Runnable() {
+		mDisciplinaOperationTask.setPostOperation(new AbstractOperationAsyncTask.OperationRunnable<Disciplina>() {
 			@Override
-			public void run() {
+			public void run(Disciplina disciplina) {
 				getSupportFragmentManager().popBackStack();
 			}
 		});

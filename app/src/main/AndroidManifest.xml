@@ -27,5 +27,6 @@
 
         <activity android:name=".app.activity.DisciplinaActivity" android:theme="@style/AppTheme.OverlayedActionBar" />
         <activity android:name=".app.activity.CalendarioAulasActivity" />
+        <activity android:name=".app.activity.ProximasAulasActivity" android:label="@string/proximas_aulas" />
     </application>
 </manifest>

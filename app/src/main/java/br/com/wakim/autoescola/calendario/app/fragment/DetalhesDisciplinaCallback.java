@@ -8,4 +8,5 @@ import br.com.wakim.autoescola.calendario.app.model.Aula;
 public interface DetalhesDisciplinaCallback extends DetalhesAulaCallback {
 	public void onNovaAula();
 	public void onAulaClicked(Aula aula);
+	public void onScroll(int top);
 }

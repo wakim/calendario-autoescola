@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/aca_disciplina_container"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/height_tab_action_bar"
+    android:background="@color/primary"
+    android:visibility="gone">
+
+    <Spinner
+        android:id="@+id/aca_disciplinas"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:background="@drawable/spinner_background_ab" />
+
+</LinearLayout>

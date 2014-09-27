@@ -12,6 +12,7 @@
     <color name="dialog_confirm">#ff2196f3</color>
 
     <color name="white">#ffffffff</color>
+    <color name="white_0_5">#aaffffff</color>
     <color name="grey_200">#eeeeee</color>
     <color name="grey_200_transparent">#44eeeeee</color>
     <color name="grey_300">#e0e0e0</color>

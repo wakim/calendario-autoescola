@@ -56,7 +56,7 @@ public abstract class InitialState {
 
 		for(int i = 0; i < aulas; ++i) {
 			int offsetDias = r.nextBoolean() ? r.nextInt(MAX_DIAS_ANTES_DEPOIS) : - r.nextInt(MAX_DIAS_ANTES_DEPOIS);
-			int hora = r.nextInt(25);
+			int hora = r.nextInt(24);
 
 			data = generateDate(now, offsetDias, hora);
 
@@ -76,7 +76,7 @@ public abstract class InitialState {
 		other.setTimeInMillis(now.getTimeInMillis());
 
 		other.add(Calendar.DAY_OF_YEAR, offsetDays);
-		other.set(Calendar.HOUR, hour);
+		other.set(Calendar.HOUR_OF_DAY, hour);
 		other.set(Calendar.MINUTE, 0);
 		other.set(Calendar.SECOND, 0);
 		other.set(Calendar.MILLISECOND, 0);

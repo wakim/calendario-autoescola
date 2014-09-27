@@ -8,8 +8,9 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
-import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Locale;
 
 import br.com.wakim.autoescola.calendario.R;
 import br.com.wakim.autoescola.calendario.app.model.Aula;
@@ -19,10 +20,10 @@ import br.com.wakim.autoescola.calendario.app.model.Aula;
  */
 public class AulasCursorAdapter extends SimpleCursorAdapter {
 
-	DateFormat mDateFormat;
+	SimpleDateFormat mDateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault());
 	Calendar mNow = Calendar.getInstance();
 
-	String[] mProjection = {
+	public static final String[] sProjection = {
 		BaseColumns._ID,
 		Aula.DATA,
 		Aula.CONCLUIDA,
@@ -43,15 +44,15 @@ public class AulasCursorAdapter extends SimpleCursorAdapter {
 	};
 
 	public AulasCursorAdapter(Context context, OnOptionClickListener optionClickListener) {
-		super(context, R.layout.list_item_aula, null,
-			new String[] {
-				BaseColumns._ID,
-				Aula.DATA,
-				Aula.CONCLUIDA,
-				Aula.DISCIPLINA
-			}, null, 0);
+		this(context, R.layout.list_item_aula, optionClickListener);
+	}
 
-		mDateFormat = DateFormat.getDateTimeInstance();
+	AulasCursorAdapter(Context context, int layoutResId, OnOptionClickListener optionClickListener) {
+		this(context, sProjection, layoutResId, optionClickListener);
+	}
+
+	AulasCursorAdapter(Context context, String[] projection, int layoutResId, OnOptionClickListener optionClickListener) {
+		super(context, layoutResId, null, projection, null, 0);
 		mOptionClickListener = optionClickListener;
 	}
 
@@ -67,7 +68,7 @@ public class AulasCursorAdapter extends SimpleCursorAdapter {
 
 			holder.check.setOnClickListener(mClickListener);
 
-			view.setTag(R.layout.list_item_disciplina, holder);
+			view.setTag(R.layout.list_item_aula, holder);
 		}
 
 		int dataIndex = cursor.getColumnIndex(Aula.DATA),
@@ -94,7 +95,7 @@ public class AulasCursorAdapter extends SimpleCursorAdapter {
 	}
 
 	public String[] getProjection() {
-		return mProjection;
+		return sProjection;
 	}
 
 	public Aula getAula(int position) {
@@ -122,12 +123,10 @@ public class AulasCursorAdapter extends SimpleCursorAdapter {
 		mDateFormat = null;
 		mClickListener = null;
 		mNow = null;
-		mProjection = null;
 	}
 
 	public static class Holder {
 		TextView data;
-		//ImageView  delete;
 		ToggleButton check;
 	}
 }

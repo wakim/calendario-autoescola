@@ -5,13 +5,11 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.provider.BaseColumns;
 
-import com.activeandroid.ActiveAndroid;
 import com.activeandroid.Cache;
 import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
 import com.activeandroid.query.Select;
-import com.activeandroid.util.SQLiteUtils;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -176,7 +174,6 @@ public class Disciplina extends Model implements Parcelable {
 	}
 
 	public Long saveAndCalculate() {
-
 		calcularTotalAulasConcluidas();
 		calcularTotalAulasRestantes();
 

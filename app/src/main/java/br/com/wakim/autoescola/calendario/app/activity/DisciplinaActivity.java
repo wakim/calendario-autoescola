@@ -13,6 +13,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 
+import com.nineoldandroids.view.ViewPropertyAnimator;
+
 import java.util.Calendar;
 
 import br.com.wakim.autoescola.calendario.R;
@@ -22,8 +24,9 @@ import br.com.wakim.autoescola.calendario.app.fragment.FragmentDialogAlert;
 import br.com.wakim.autoescola.calendario.app.fragment.FragmentEditDisciplina;
 import br.com.wakim.autoescola.calendario.app.fragment.FragmentSumarioAulas;
 import br.com.wakim.autoescola.calendario.app.model.Aula;
-import br.com.wakim.autoescola.calendario.app.model.task.AulaOperationAsyncTask;
 import br.com.wakim.autoescola.calendario.app.model.Disciplina;
+import br.com.wakim.autoescola.calendario.app.model.task.AbstractOperationAsyncTask;
+import br.com.wakim.autoescola.calendario.app.model.task.AulaOperationAsyncTask;
 import br.com.wakim.autoescola.calendario.app.utils.ColorHelper;
 import br.com.wakim.autoescola.calendario.app.utils.Params;
 
@@ -43,7 +46,6 @@ public class DisciplinaActivity extends BaseActivity
 
 	Menu mMenu;
 
-	View mTopBackground;
 	boolean mIsTablet = false;
 
 	@Override
@@ -62,7 +64,6 @@ public class DisciplinaActivity extends BaseActivity
 
 		mDetalhesDisciplina = null;
 		mSumarioAulas = null;
-		mTopBackground = null;
 		mDialog = null;
 		mAulaOperationAsyncTask = null;
 	}
@@ -84,16 +85,23 @@ public class DisciplinaActivity extends BaseActivity
 
 		setContentView(R.layout.activity_disciplina);
 
-		mTopBackground = findViewById(R.id.ad_top_background);
-
 		getDetalhesDisciplina().setDisciplina(mDisciplina);
 
 		if(! mIsTablet) {
 			getDetalhesDisciplina().setHeaderPadding(getResources().getDimensionPixelSize(R.dimen.ab_height));
 		}
 
-		if(mTopBackground != null) {
-			mTopBackground.setBackgroundColor(ColorHelper.darkenColor(mDisciplina.getCor()));
+		View topBackground = findViewById(R.id.ad_top_background);
+		View topAdjustment = findViewById(R.id.ad_top_adjustment);
+
+		// Tablet
+		if(topBackground != null) {
+			topBackground.setBackgroundColor(ColorHelper.darkenColor(mDisciplina.getCor()));
+		}
+
+		// Landscape
+		if(topAdjustment != null) {
+			topAdjustment.setBackgroundColor(mDisciplina.getCor());
 		}
 
 		FragmentManager fm = getSupportFragmentManager();
@@ -168,7 +176,6 @@ public class DisciplinaActivity extends BaseActivity
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-
 		switch(item.getItemId()) {
 			case R.id.dd_edit:
 				toggleDetailsDisciplinaFragment();
@@ -317,15 +324,45 @@ public class DisciplinaActivity extends BaseActivity
 	}
 
 	@Override
+	public void onScroll(int top) {
+		// TODO
+		FragmentDetalhesDisciplina f = getDetalhesDisciplina();
+		final FragmentSumarioAulas a = mSumarioAulas;
+
+		if(f == null || top == 0) {
+			return;
+		}
+
+		final View v = f.getView();
+
+		if(v == null) {
+			return;
+		}
+
+		float height = v.getHeight();
+		float actualHeight = height - (top >= (height / 2f) ? height / 2 : top);
+
+		v.getLayoutParams().height = (int) actualHeight;
+
+		v.post(new Runnable() {
+			@Override
+			public void run() {
+				v.requestLayout();
+				a.getView().requestLayout();
+			}
+		});
+	}
+
+	@Override
 	public void onAulaConcluidaToggle(Aula aula) {
 		mAulaOperationAsyncTask = new AulaOperationAsyncTask(aula, AulaOperationAsyncTask.Operation.CONCLUIDA_TOGGLE);
 
 		aula.setDisciplina(mDisciplina);
 
-		mAulaOperationAsyncTask.setPostOperation(new Runnable() {
+		mAulaOperationAsyncTask.setPostOperation(new AbstractOperationAsyncTask.OperationRunnable<Aula>() {
 			@Override
-			public void run() {
-				getDetalhesDisciplina().setDisciplina(mDisciplina);
+			public void run(Aula a) {
+				getDetalhesDisciplina().setDisciplina(a.getDisciplina());
 			}
 		});
 
@@ -339,9 +376,9 @@ public class DisciplinaActivity extends BaseActivity
 
 		aula.setDisciplina(mDisciplina);
 
-		mAulaOperationAsyncTask.setPostOperation(new Runnable() {
+		mAulaOperationAsyncTask.setPostOperation(new AbstractOperationAsyncTask.OperationRunnable<Aula>() {
 			@Override
-			public void run() {
+			public void run(Aula a) {
 				getDetalhesDisciplina().setDisciplina(mDisciplina);
 			}
 		});
@@ -351,13 +388,12 @@ public class DisciplinaActivity extends BaseActivity
 
 	void goToCalendar(Calendar calendar) {
 
-		if(calendar == null) {
-			calendar = Calendar.getInstance();
-		}
-
 		Intent intent = new Intent(this, CalendarioAulasActivity.class);
 
-		intent.putExtra(Params.CURRENT_DATE, calendar);
+		if(calendar != null) {
+			intent.putExtra(Params.CURRENT_DATE, calendar);
+		}
+
 		intent.putExtra(Params.DISCIPLINA, mDisciplina);
 
 		startActivity(intent);
@@ -407,10 +443,10 @@ public class DisciplinaActivity extends BaseActivity
 	}
 
 	@Override
-	public void onCancel() {}
+	public void onDialogCancel() {}
 
 	@Override
-	public void onConfirm() {
+	public void onDialogConfirm() {
 		deleteDisciplina();
 	}
 }

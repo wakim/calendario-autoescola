@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -84,15 +83,6 @@ public class FragmentDetalhesAula extends FragmentMaterialDialog implements Load
 		super.onSaveInstanceState(outState);
 
 		outState.putLong(Params.AULA, mAulaId);
-	}
-
-	@Override
-	public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-		super.onViewCreated(view, savedInstanceState);
-
-		Object o = getActivity();
-
-		Log.i("TAH", o.toString());
 	}
 
 	@Override

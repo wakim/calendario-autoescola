@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/height_two_line"
+    android:gravity="center_vertical"
+    android:descendantFocusability="blocksDescendants"
+    android:background="@color/white">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/height_two_line"
+        android:layout_weight="1"
+        android:gravity="center_vertical">
+
+        <br.com.wakim.autoescola.calendario.app.view.RobotoTextView
+            android:id="@+id/lipa_name"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            style="@style/Material.List.TextView.Primary"
+            android:gravity="bottom"
+            android:text="Direção Defensiva"
+            app:typeface="medium" />
+
+        <br.com.wakim.autoescola.calendario.app.view.RobotoTextView
+            android:id="@+id/lipa_data"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            style="@style/Material.List.TextView.Secondary"
+            android:text="HH:MM - HH:MM"
+            app:typeface="regular" />
+
+    </LinearLayout>
+
+    <ToggleButton
+        android:id="@+id/lipa_check"
+        android:layout_width="@dimen/width_list_icon"
+        android:layout_height="@dimen/height_list_icon"
+        android:layout_gravity="center_vertical"
+        android:layout_marginEnd="@dimen/margin_list_icon"
+        android:layout_marginLeft="@dimen/margin_list_icon"
+        android:layout_marginStart="@dimen/margin_list_icon"
+        android:textOn="@null"
+        android:textOff="@null"
+        android:background="@drawable/custom_check_toggle" />
+
+</LinearLayout>

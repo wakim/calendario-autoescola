@@ -1,7 +1,6 @@
 package br.com.wakim.autoescola.calendario.app.adapter;
 
 import android.support.annotation.IdRes;
-import android.support.annotation.LayoutRes;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -66,5 +65,9 @@ public class CalendarWeekAdapter extends FragmentPagerAdapter {
 
 	public static String makeFragmentName(int viewId, long id) {
 		return "android:switcher:" + viewId + ":" + id;
+	}
+
+	public FragmentSumarioAulasIntervalo getFragments(int position) {
+		return fragments.get(position);
 	}
 }

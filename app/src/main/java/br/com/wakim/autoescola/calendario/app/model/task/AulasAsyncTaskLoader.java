@@ -11,6 +11,7 @@ import java.util.TimeZone;
 
 import br.com.wakim.autoescola.calendario.app.model.Aula;
 import br.com.wakim.autoescola.calendario.app.model.DefaultEventImpl;
+import br.com.wakim.autoescola.calendario.app.utils.CalendarHelper;
 import br.com.wakim.weekcalendarview.model.Event;
 import hirondelle.date4j.DateTime;
 
@@ -54,12 +55,7 @@ public class AulasAsyncTaskLoader extends AsyncTaskLoader<Map<DateTime, Event>> 
 		for(Aula aula : listaAulas) {
 			calendar.setTimeInMillis(aula.getData());
 
-			int year = calendar.get(Calendar.YEAR);
-			int month = calendar.get(Calendar.MONTH) + 1;
-			int day = calendar.get(Calendar.DATE);
-			int hour = calendar.get(Calendar.HOUR);
-
-			DateTime dt = new DateTime(year, month, day, hour, 0, 0, 0);
+			DateTime dt = CalendarHelper.convertDateToDateTime(calendar);
 
 			aulas.put(dt, new DefaultEventImpl(dt, aula.getDisciplina().getSimbolo(), aula.getDisciplina().getCor(), aula.getId(), aula.getDisciplina().getId(), aula.getDisciplina().getNome()));
 		}

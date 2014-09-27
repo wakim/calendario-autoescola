@@ -43,6 +43,7 @@
     <dimen name="height_dialog_top_icon">56dp</dimen>
     <dimen name="height_suplemental_action">32dp</dimen>
     <dimen name="height_spinner_item">48dp</dimen>
+    <dimen name="height_tab_action_bar">48dp</dimen>
 
     <dimen name="tag_color_dot_size">12dp</dimen>
 

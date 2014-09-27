@@ -9,8 +9,6 @@ import android.text.TextPaint;
 import java.util.HashMap;
 import java.util.Map;
 
-import br.com.wakim.weekcalendarview.utils.WidthHeight;
-
 /**
  * Created by wakim on 02/09/14.
  */

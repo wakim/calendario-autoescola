@@ -5,17 +5,20 @@ import android.os.AsyncTask;
 /**
  * Created by wakim on 13/09/14.
  */
-public abstract class AbstractOperationAsyncTask<Params, Progress, Result> extends AsyncTask<Params, Progress, Result> {
+public abstract class AbstractOperationAsyncTask<Resource, Params, Progress, Result> extends AsyncTask<Params, Progress, Result> {
 
+	Resource mResource;
 	Operation mOp;
-	Runnable mPostOperation;
+	OperationRunnable<Resource> mPostOperation;
 
-	public AbstractOperationAsyncTask(Operation op) {
+	public AbstractOperationAsyncTask(Resource resource, Operation op) {
 		mOp = op;
+		mResource = resource;
 	}
 
-	public void setPostOperation(Runnable postOperation) {
+	public AbstractOperationAsyncTask setPostOperation(OperationRunnable<Resource> postOperation) {
 		mPostOperation = postOperation;
+		return this;
 	}
 
 	@Override
@@ -23,8 +26,11 @@ public abstract class AbstractOperationAsyncTask<Params, Progress, Result> exten
 		super.onPostExecute(result);
 
 		if(mPostOperation != null) {
-			mPostOperation.run();
+			mPostOperation.run(mResource);
 		}
+
+		mPostOperation = null;
+		mResource = null;
 	}
 
 	@Override
@@ -34,5 +40,9 @@ public abstract class AbstractOperationAsyncTask<Params, Progress, Result> exten
 
 	public static enum Operation {
 		PERSIST, UPDATE_DATE, DELETE, CONCLUIDA_TOGGLE;
+	}
+
+	public static interface OperationRunnable<T> {
+		public void run(T t);
 	}
 }

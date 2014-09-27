@@ -19,21 +19,15 @@ package com.faizmalkani.floatingactionbutton;
 import android.view.View;
 import android.widget.AbsListView;
 
-import java.lang.ref.WeakReference;
-
 /**
  * Created by Stéphane on 09/07/2014.
  */
-class DirectionScrollListener implements AbsListView.OnScrollListener {
+class AbsListViewDirectionScrollListener extends AbstractDirectionScrollListener implements AbsListView.OnScrollListener {
 
-	private static final int DIRECTION_CHANGE_THRESHOLD = 1;
-	private final WeakReference<FloatingActionButton> mFloatingActionButton;
 	private int mPrevPosition;
-	private int mPrevTop;
-	private boolean mUpdated;
 
-	DirectionScrollListener(FloatingActionButton floatingActionButton) {
-		mFloatingActionButton = new WeakReference<FloatingActionButton>(floatingActionButton);
+	AbsListViewDirectionScrollListener(FloatingActionButton floatingActionButton) {
+		super(floatingActionButton);
 	}
 
 	@Override
@@ -56,16 +50,12 @@ class DirectionScrollListener implements AbsListView.OnScrollListener {
 			goingDown = firstVisibleItem > mPrevPosition;
 		}
 
-		if (changed && mUpdated && mFloatingActionButton.get() != null) {
-			mFloatingActionButton.get().hide(goingDown);
-		}
-
 		mPrevPosition = firstVisibleItem;
 		mPrevTop = firstViewTop;
-		mUpdated = true;
+
+		hide(changed, goingDown);
 	}
 
 	@Override
-	public void onScrollStateChanged(AbsListView view, int scrollState) {
-	}
+	public void onScrollStateChanged(AbsListView view, int scrollState) {}
 }

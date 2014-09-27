@@ -13,7 +13,7 @@ public class CalendarHelper {
 		int year = calendar.get(Calendar.YEAR);
 		int javaMonth = calendar.get(Calendar.MONTH);
 		int day = calendar.get(Calendar.DATE);
-		int hour = calendar.get(Calendar.HOUR);
+		int hour = calendar.get(Calendar.HOUR_OF_DAY);
 
 		// javaMonth start at 0. Need to plus 1 to get datetimeMonth
 		return new DateTime(year, javaMonth + 1, day, hour, 0, 0, 0);

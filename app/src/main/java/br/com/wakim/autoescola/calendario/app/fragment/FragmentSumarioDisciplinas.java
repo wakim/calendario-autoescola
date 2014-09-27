@@ -28,7 +28,6 @@ import br.com.wakim.autoescola.calendario.app.utils.Params;
 public class FragmentSumarioDisciplinas extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor>, View.OnClickListener {
 
 	DisciplinasCursorAdapter mCursorAdapter;
-
 	SumarioDisciplinasCallback mCallback;
 
 	@Override

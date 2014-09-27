@@ -9,17 +9,18 @@
 
     <LinearLayout
         android:orientation="vertical"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
-
-    <br.com.wakim.autoescola.calendario.app.view.RobotoTextView
-        android:id="@android:id/text2"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        style="@style/Material.List.TextView.Secondary"
-        android:textColor="@color/white"
-        android:text="Hoje, Segunda"
-        app:typeface="regular" />
+        android:layout_weight="1">
+
+        <br.com.wakim.autoescola.calendario.app.view.RobotoTextView
+            android:id="@android:id/text2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/Material.List.TextView.Secondary"
+            android:textColor="@color/white"
+            android:text="Hoje, Segunda"
+            app:typeface="regular" />
 
         <br.com.wakim.autoescola.calendario.app.view.RobotoTextView
             android:id="@android:id/text1"

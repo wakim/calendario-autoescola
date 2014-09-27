@@ -84,7 +84,7 @@ public class FragmentDialogColorPicker extends FragmentMaterialDialog {
 	@Override
 	public boolean onConfirm() {
 		if(mListener != null) {
-			mListener.onConfirm(mPicker.getColor());
+			mListener.onColorPickerConfirm(mPicker.getColor());
 		}
 
 		return true;
@@ -93,7 +93,7 @@ public class FragmentDialogColorPicker extends FragmentMaterialDialog {
 	@Override
 	public boolean onCancel() {
 		if(mListener != null) {
-			mListener.onCancel();
+			mListener.onColorPickerCancel();
 		}
 
 		return true;
@@ -105,7 +105,7 @@ public class FragmentDialogColorPicker extends FragmentMaterialDialog {
 	}
 
 	public static interface DialogListener {
-		public void onCancel();
-		public void onConfirm(int cor);
+		public void onColorPickerCancel();
+		public void onColorPickerConfirm(int cor);
 	}
 }

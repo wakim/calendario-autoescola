@@ -57,10 +57,16 @@
     <string name="hoje">Hoje</string>
     <string name="amanha">Amanhã</string>
     <string name="ontem">Ontem</string>
+
     <string name="data">Data</string>
+
     <string name="aulas_concluidas">Aulas Concluídas</string>
     <string name="aulas_restantes">Aulas Restantes</string>
+
     <string name="detalhes_da_aula">Detalhes da Aula</string>
+
+    <string name="proximas_aulas">Próximas aulas</string>
+    <string name="proximas_aulas_hoje">Próximas aulas de hoje</string>
 
     <string-array name="periodo">
         <item>Ontem</item>

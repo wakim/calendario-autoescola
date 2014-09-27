@@ -16,20 +16,27 @@ import android.view.Display;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.TranslateAnimation;
 import android.widget.AbsListView;
 
 import br.com.wakim.autoescola.calendario.R;
+import br.com.wakim.autoescola.calendario.app.view.ObservableScrollView;
 
-public class FloatingActionButton extends View {
+public class FloatingActionButton extends View implements Animation.AnimationListener {
+
+	private static final long ANIMATION_DURATION = 500l;
 
 	private Paint mButtonPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 	private Paint mDrawablePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 	private Bitmap mBitmap;
+
 	private int mScreenHeight;
 	private int mColor;
-	private boolean mHidden = false;
+	private boolean mHidden = false, mStick = false;
+
+	Runnable mAnimationRunnable;
 
 	TranslateAnimation mBottomUpAnimation;
 	LinearInterpolator mInterpolator = new LinearInterpolator();
@@ -38,12 +45,7 @@ public class FloatingActionButton extends View {
 	@Override
 	protected void onDetachedFromWindow() {
 		super.onDetachedFromWindow();
-
-		mBottomUpAnimation = null;
-		mInterpolator = null;
-		mReverseIntepolator = null;
-
-		mDrawablePaint = mButtonPaint = null;
+		mAnimationRunnable = null;
 	}
 
 	public FloatingActionButton(Context context) {
@@ -79,9 +81,10 @@ public class FloatingActionButton extends View {
 		}
 
 		mBottomUpAnimation = new TranslateAnimation(0, 0, mScreenHeight, 0);
+		mBottomUpAnimation.setAnimationListener(this);
 
 		mBottomUpAnimation.setFillAfter(true);
-		mBottomUpAnimation.setDuration(500l);
+		mBottomUpAnimation.setDuration(ANIMATION_DURATION);
 
 		setWillNotDraw(false);
 
@@ -120,6 +123,9 @@ public class FloatingActionButton extends View {
 		invalidate();
 	}
 
+	public void setStick(boolean stick) {
+		mStick = stick;
+	}
 
 	@Override
 	protected void onDraw(Canvas canvas) {
@@ -152,19 +158,46 @@ public class FloatingActionButton extends View {
 		return super.onTouchEvent(event);
 	}
 
+	public void hide(boolean hide, long duration, Runnable endAction) {
+		mAnimationRunnable = endAction;
+		hide(hide, duration);
+	}
+
 	public void hide(boolean hide) {
-		if (mHidden != hide) {
+		hide(hide, ANIMATION_DURATION);
+	}
 
-			mHidden = hide;
+	public void hide(boolean hide, long duration) {
 
-			mBottomUpAnimation.setInterpolator(mHidden ? mReverseIntepolator : mInterpolator);
-			startAnimation(mBottomUpAnimation);
+		if(mStick) {
+			return;
 		}
+
+		if(mHidden == hide) {
+			return;
+		}
+
+		mHidden = hide;
+
+		if(mBottomUpAnimation.hasStarted() && ! mBottomUpAnimation.hasEnded() && hide) {
+			return;
+		}
+
+		mBottomUpAnimation.setInterpolator(mHidden ? mReverseIntepolator : mInterpolator);
+		mBottomUpAnimation.setDuration(duration);
+
+		startAnimation(mBottomUpAnimation);
 	}
 
 	public void listenTo(AbsListView listView) {
 		if (null != listView) {
-			listView.setOnScrollListener(new DirectionScrollListener(this));
+			listView.setOnScrollListener(new AbsListViewDirectionScrollListener(this));
+		}
+	}
+
+	public void listenTo(ObservableScrollView scrollView) {
+		if(scrollView != null) {
+			scrollView.setOnScrollListener(new ScrollViewDirectionScrollListener(this));
 		}
 	}
 
@@ -176,4 +209,19 @@ public class FloatingActionButton extends View {
 
 		return Color.HSVToColor(hsv);
 	}
+
+	@Override
+	public void onAnimationStart(Animation animation) {}
+
+	@Override
+	public void onAnimationEnd(Animation animation) {
+		if(mAnimationRunnable != null) {
+			mAnimationRunnable.run();
+		}
+
+		mAnimationRunnable = null;
+	}
+
+	@Override
+	public void onAnimationRepeat(Animation animation) {}
 }

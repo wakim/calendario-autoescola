@@ -1,7 +1,6 @@
 package br.com.wakim.autoescola.calendario.app.fragment;
 
 import android.app.Activity;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -14,8 +13,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 
-import java.text.DateFormat;
+import com.faizmalkani.floatingactionbutton.FloatingActionButton;
+
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 
@@ -23,10 +25,12 @@ import br.com.wakim.autoescola.calendario.R;
 import br.com.wakim.autoescola.calendario.app.model.Aula;
 import br.com.wakim.autoescola.calendario.app.model.DefaultEventImpl;
 import br.com.wakim.autoescola.calendario.app.model.GridMode;
+import br.com.wakim.autoescola.calendario.app.model.task.AbstractOperationAsyncTask;
 import br.com.wakim.autoescola.calendario.app.model.task.AulaOperationAsyncTask;
 import br.com.wakim.autoescola.calendario.app.model.task.AulasAsyncTaskLoader;
 import br.com.wakim.autoescola.calendario.app.utils.FontHelper;
 import br.com.wakim.autoescola.calendario.app.utils.Params;
+import br.com.wakim.autoescola.calendario.app.view.ObservableScrollView;
 import br.com.wakim.weekcalendarview.WeekCalendarHeaderView;
 import br.com.wakim.weekcalendarview.WeekCalendarView;
 import br.com.wakim.weekcalendarview.listener.OnDateClickListener;
@@ -40,7 +44,8 @@ import hirondelle.date4j.DateTime;
  * Created by wakim on 17/08/14.
  */
 public class FragmentSumarioAulasIntervalo extends Fragment
-	implements LoaderManager.LoaderCallbacks<Map<DateTime, Event>>, OnDragListener, OnDateClickListener, FragmentDialogAlert.DialogListener, DetalhesAulaCallback {
+	implements LoaderManager.LoaderCallbacks<Map<DateTime, Event>>, OnDragListener,
+	OnDateClickListener, FragmentDialogAlert.DialogListener, DetalhesAulaCallback, View.OnClickListener {
 
 	AulaOperationAsyncTask mAulaOperationAsyncTask;
 
@@ -48,17 +53,23 @@ public class FragmentSumarioAulasIntervalo extends Fragment
 	DateTime mBaseDate;
 
 	GridMode mMode;
-	boolean mModeChanged = false, mScrollToDate = false;
+	boolean mModeChanged = false,
+			mScrollToDate = false,
+			mBatchInsertMode = false;
 
 	WeekCalendarHeaderView mWeekCalendarHeaderView;
 	WeekCalendarView mWeekCalendarView;
 
-	DateFormat mDateFormat = DateFormat.getDateTimeInstance();
+	SimpleDateFormat mDateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault());
 
 	// If dialog of replace event is showing and orientation changed, lets store the events
 	Event mTargetEvent, mDraggedEvent;
 	FragmentDialogAlert mDialogReplacement;
 	FragmentDetalhesAula mDetalhesAula;
+
+	SumarioAulasIntervaloCallback mCallback;
+
+	FloatingActionButton mFAB;
 
 	public static FragmentSumarioAulasIntervalo newInstance(DateTime baseDate, GridMode mode, int loaderIncrementId) {
 		Bundle bundle = new Bundle();
@@ -110,6 +121,8 @@ public class FragmentSumarioAulasIntervalo extends Fragment
 
 			mTargetEvent = savedInstanceState.getParcelable(Params.TARGET_EVENT);
 			mDraggedEvent = savedInstanceState.getParcelable(Params.DRAGGED_EVENT);
+
+			mBatchInsertMode = savedInstanceState.getBoolean(Params.BATCH_INSERT_MODE, false);
 		}
 	}
 
@@ -148,6 +161,13 @@ public class FragmentSumarioAulasIntervalo extends Fragment
 			}
 		});
 
+		mFAB = (FloatingActionButton) view.findViewById(R.id.fsad_fab);
+
+		mFAB.setOnClickListener(this);
+		mFAB.listenTo((ObservableScrollView) view.findViewById(R.id.fsad_scrollview));
+
+		updateFAB(false);
+
 		return view;
 	}
 
@@ -175,11 +195,17 @@ public class FragmentSumarioAulasIntervalo extends Fragment
 	@Override
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
+
+		if(activity instanceof SumarioAulasIntervaloCallback) {
+			mCallback = (SumarioAulasIntervaloCallback) activity;
+		}
 	}
 
 	@Override
 	public void onDetach() {
 		super.onDetach();
+
+		mCallback = null;
 	}
 
 	@Override
@@ -191,6 +217,7 @@ public class FragmentSumarioAulasIntervalo extends Fragment
 
 		outState.putParcelable(Params.TARGET_EVENT, mTargetEvent);
 		outState.putParcelable(Params.DRAGGED_EVENT, mDraggedEvent);
+		outState.putBoolean(Params.BATCH_INSERT_MODE, mBatchInsertMode);
 	}
 
 	public void setGridMode(GridMode mode) {
@@ -278,6 +305,37 @@ public class FragmentSumarioAulasIntervalo extends Fragment
 		return DropAction.WAIT;
 	}
 
+	@Override
+	public void onDateClicked(DateTime date) {
+		if(mBatchInsertMode) {
+			if (mCallback != null) {
+				mCallback.onDateClick(date);
+			}
+		}
+	}
+
+	@Override
+	public void onDateClicked(DateTime date, Event event) {
+		DefaultEventImpl dEvent = (DefaultEventImpl) event;
+
+		if(mBatchInsertMode && mCallback != null) {
+			mCallback.onAulaClick(dEvent.getIdAula(), dEvent.getIdDisciplina(), dEvent.getNomeDisciplina(), date);
+			return;
+		}
+
+		if(mDetalhesAula == null) {
+			mDetalhesAula = new FragmentDetalhesAula(getActivity(), dEvent.getIdAula());
+
+			mDetalhesAula.setShowsDialog(true);
+			mDetalhesAula.setCancelable(true);
+		} else {
+			mDetalhesAula.getArguments().putLong(Params.AULA, dEvent.getIdAula());
+		}
+
+		mDetalhesAula.setDetalhesAulaCallback(this);
+		mDetalhesAula.show(getChildFragmentManager(), getString(R.string.detalhes_aula_tag));
+	}
+
 	void showDropDialog(final Event aulaSubstituta, final Event aulaAlvo, DateTime data) {
 		Date date = new Date(data.getMilliseconds(TimeZone.getDefault()));
 		String dataFormatada = mDateFormat.format(date);
@@ -316,29 +374,7 @@ public class FragmentSumarioAulasIntervalo extends Fragment
 	}
 
 	@Override
-	public void onDateClicked(DateTime date) {
-	}
-
-	@Override
-	public void onDateClicked(DateTime date, Event event) {
-		DefaultEventImpl dEvent = (DefaultEventImpl) event;
-
-		if(mDetalhesAula == null) {
-			mDetalhesAula = new FragmentDetalhesAula(getActivity(), dEvent.getIdAula());
-
-			mDetalhesAula.setShowsDialog(true);
-			mDetalhesAula.setCancelable(true);
-		} else {
-			mDetalhesAula.getArguments().putLong(Params.AULA, dEvent.getIdAula());
-		}
-
-		mDetalhesAula.setDetalhesAulaCallback(this);
-
-		mDetalhesAula.show(getChildFragmentManager(), getString(R.string.detalhes_aula_tag));
-	}
-
-	@Override
-	public void onCancel() {
+	public void onDialogCancel() {
 		mWeekCalendarView.revertEventDrop(mDraggedEvent);
 
 		mDraggedEvent = null;
@@ -346,7 +382,7 @@ public class FragmentSumarioAulasIntervalo extends Fragment
 	}
 
 	@Override
-	public void onConfirm() {
+	public void onDialogConfirm() {
 		mDraggedEvent.setDate(mTargetEvent.getDate());
 		mWeekCalendarView.commitEventDrop(mDraggedEvent);
 
@@ -356,9 +392,9 @@ public class FragmentSumarioAulasIntervalo extends Fragment
 
 		mAulaOperationAsyncTask = new AulaOperationAsyncTask(((DefaultEventImpl) mTargetEvent).getIdAula(), AulaOperationAsyncTask.Operation.DELETE);
 
-		mAulaOperationAsyncTask.setPostOperation(new Runnable() {
+		mAulaOperationAsyncTask.setPostOperation(new AbstractOperationAsyncTask.OperationRunnable<Aula>() {
 			@Override
-			public void run() {
+			public void run(Aula aula) {
 				mLoader.onContentChanged();
 			}
 		});
@@ -373,9 +409,9 @@ public class FragmentSumarioAulasIntervalo extends Fragment
 	public void onAulaConcluidaToggle(Aula aula) {
 		mAulaOperationAsyncTask = new AulaOperationAsyncTask(aula, AulaOperationAsyncTask.Operation.CONCLUIDA_TOGGLE);
 
-		mAulaOperationAsyncTask.setPostOperation(new Runnable() {
+		mAulaOperationAsyncTask.setPostOperation(new AbstractOperationAsyncTask.OperationRunnable<Aula>() {
 			@Override
-			public void run() {
+			public void run(Aula a) {
 				if(mDetalhesAula != null) {
 					mDetalhesAula.updateAula();
 				}
@@ -389,9 +425,9 @@ public class FragmentSumarioAulasIntervalo extends Fragment
 	public void onAulaDeleted(Aula aula) {
 		mAulaOperationAsyncTask = new AulaOperationAsyncTask(aula, AulaOperationAsyncTask.Operation.DELETE);
 
-		mAulaOperationAsyncTask.setPostOperation(new Runnable() {
+		mAulaOperationAsyncTask.setPostOperation(new AbstractOperationAsyncTask.OperationRunnable<Aula>() {
 			@Override
-			public void run() {
+			public void run(Aula a) {
 				mLoader.onContentChanged();
 			}
 		});
@@ -421,5 +457,67 @@ public class FragmentSumarioAulasIntervalo extends Fragment
 		} else {
 			mScrollToDate = true;
 		}
+	}
+
+	@Override
+	public void onClick(View v) {
+		if(R.id.fsad_fab == v.getId() && mCallback != null) {
+			if(mBatchInsertMode) {
+				mCallback.onCancelAulaBatchInsertMode();
+			} else {
+				mCallback.onEnableAulaBatchInsertMode();
+			}
+		}
+	}
+
+	public void enableAulaBatchInsertMode() {
+		mBatchInsertMode = true;
+		updateFAB(true);
+	}
+
+	public void cancelAulaBatchInsertMode() {
+		mBatchInsertMode = false;
+		updateFAB(true);
+	}
+
+	void updateFAB(boolean animated) {
+
+		if(mFAB == null) {
+			return;
+		}
+
+		if(! animated) {
+			updateFABDrawable();
+		} else {
+			mFAB.setStick(false);
+			mFAB.hide(true, 250l, new Runnable() {
+				@Override
+				public void run() {
+					mFAB.hide(false, 250l, null);
+					updateFABDrawable();
+				}
+			});
+		}
+	}
+
+	void updateFABDrawable() {
+		if(mBatchInsertMode) {
+			mFAB.setDrawable(getResources().getDrawable(R.drawable.ic_fab_clear_dark));
+			mFAB.setStick(true);
+		} else {
+			mFAB.setDrawable(getResources().getDrawable(R.drawable.ic_fab_add_dark));
+			mFAB.setStick(false);
+		}
+	}
+
+	public void addEvent(Event event) {
+		mWeekCalendarView.addEvent(event);
+	}
+
+	public static interface SumarioAulasIntervaloCallback {
+		public void onEnableAulaBatchInsertMode();
+		public void onCancelAulaBatchInsertMode();
+		public void onDateClick(DateTime time);
+		public void onAulaClick(long aulaId, long disciplinaId, String nomeDisciplina, DateTime date);
 	}
 }

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    tools:context=".app.activity.DisciplinaActivity">
+
+    <fragment
+        android:id="@+id/ad_main_fragment"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:name="br.com.wakim.autoescola.calendario.app.fragment.FragmentDetalhesDisciplina"
+        tools:layout="@layout/fragment_detalhes_disciplina"
+        android:tag="@string/detalhes_disciplina_tag" />
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1">
+
+        <View
+            android:id="@+id/ad_top_adjustment"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/ab_height"
+            android:background="@color/primary" />
+
+        <FrameLayout
+            android:id="@+id/ad_secondary_fragment"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+    </LinearLayout>
+
+
+</LinearLayout>

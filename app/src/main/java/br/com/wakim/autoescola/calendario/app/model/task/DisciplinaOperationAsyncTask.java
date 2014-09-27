@@ -5,13 +5,10 @@ import br.com.wakim.autoescola.calendario.app.model.Disciplina;
 /**
  * Created by wakim on 13/09/14.
  */
-public class DisciplinaOperationAsyncTask extends AbstractOperationAsyncTask<Void, Void, Void> {
-
-	Disciplina mDisciplina;
+public class DisciplinaOperationAsyncTask extends AbstractOperationAsyncTask<Disciplina, Void, Void, Void> {
 
 	public DisciplinaOperationAsyncTask(Disciplina disciplina, Operation op) {
-		super(op);
-		mDisciplina = disciplina;
+		super(disciplina, op);
 	}
 
 	@Override
@@ -28,6 +25,6 @@ public class DisciplinaOperationAsyncTask extends AbstractOperationAsyncTask<Voi
 	}
 
 	void persist() {
-		mDisciplina.saveAndCalculate();
+		mResource.saveAndCalculate();
 	}
 }

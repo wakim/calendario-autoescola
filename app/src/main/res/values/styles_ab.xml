@@ -60,6 +60,7 @@
 	
     <style name="DropDownListView.Ab" parent="@style/Widget.AppCompat.ListView.DropDown">
         <item name="android:listSelector">@drawable/selectable_background_ab</item>
+        <item name="android:divider">@null</item>
     </style>
 
     <style name="ActionBarTabStyle.Ab" parent="@style/Widget.AppCompat.ActionBar.TabView">
@@ -85,5 +86,4 @@
         <item name="popupMenuStyle">@style/PopupMenu.Ab</item>
         <item name="dropDownListViewStyle">@style/DropDownListView.Ab</item>
     </style>
-
 </resources>

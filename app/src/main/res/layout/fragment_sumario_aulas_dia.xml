@@ -1,31 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="@color/white">
 
-    <br.com.wakim.weekcalendarview.WeekCalendarHeaderView
-        android:id="@+id/fsad_calendar_header_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:preferred_font_size="16sp" />
-
-    <ScrollView
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fillViewport="true">
+        android:layout_height="match_parent">
 
-        <br.com.wakim.weekcalendarview.WeekCalendarView
-            android:id="@+id/fsad_calendar_view"
+        <br.com.wakim.weekcalendarview.WeekCalendarHeaderView
+            android:id="@+id/fsad_calendar_header_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:line_color="@color/grey_500"
-            app:stripe_color="@color/grey_200"
-            app:font_size="16sp"
-            app:drag_enabled="true" />
-    </ScrollView>
-</LinearLayout>
+            app:preferred_font_size="16sp" />
+
+        <br.com.wakim.autoescola.calendario.app.view.ObservableScrollView
+            android:id="@+id/fsad_scrollview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true">
+
+            <br.com.wakim.weekcalendarview.WeekCalendarView
+                android:id="@+id/fsad_calendar_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:line_color="@color/grey_500"
+                app:stripe_color="@color/grey_200"
+                app:font_size="16sp"
+                app:drag_enabled="true" />
+        </br.com.wakim.autoescola.calendario.app.view.ObservableScrollView>
+    </LinearLayout>
+
+    <com.faizmalkani.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fsad_fab"
+        android:layout_width="@dimen/fab_size"
+        android:layout_height="@dimen/fab_size"
+        android:layout_gravity="bottom|right"
+        android:layout_marginBottom="@dimen/margin_bottom_fab"
+        android:layout_marginRight="@dimen/margin_right_fab"
+        app:drawable="@drawable/ic_fab_add_dark"
+        app:color="@color/fab" />
+
+</FrameLayout>

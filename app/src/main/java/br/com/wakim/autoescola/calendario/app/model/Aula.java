@@ -121,16 +121,18 @@ public class Aula extends Model implements Parcelable {
 		from.where("1=1");
 
 		if(dataInicial != null) {
-			from.and("data >= ?", dataInicial);
+			from = from.and(Aula.DATA + " >= ?", dataInicial);
 		}
 
 		if(dataFinal != null) {
-			from.and("data <= ?", dataFinal);
+			from = from.and(Aula.DATA + " <= ?", dataFinal);
 		}
 
 		if(disciplinas != null && disciplinas.length > 0) {
-			from.and("disciplina IN ?", serialize(disciplinas));
+			from = from.and("disciplina IN ?", serialize(disciplinas));
 		}
+
+		from = from.orderBy(Aula.DATA + " ASC");
 
 		return from.execute();
 	}

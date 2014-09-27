@@ -25,7 +25,8 @@ public class DisciplinasSpinnerCursorAdapter extends SimpleCursorAdapter {
 			BaseColumns._ID,
 			Disciplina.NOME,
 			Disciplina.COR,
-			Disciplina.SIMBOLO
+			Disciplina.SIMBOLO,
+			Disciplina.LIMITE
 	};
 
 	public DisciplinasSpinnerCursorAdapter(Context context) {
@@ -33,7 +34,8 @@ public class DisciplinasSpinnerCursorAdapter extends SimpleCursorAdapter {
 				BaseColumns._ID,
 				Disciplina.NOME,
 				Disciplina.COR,
-				Disciplina.SIMBOLO
+				Disciplina.SIMBOLO,
+				Disciplina.LIMITE
 		}, null, 0);
 
 		mDotSize = context.getResources().getDimensionPixelSize(R.dimen.tag_color_dot_size);
@@ -71,25 +73,35 @@ public class DisciplinasSpinnerCursorAdapter extends SimpleCursorAdapter {
 			holder = new Holder();
 
 			holder.text1 = (TextView) view.findViewById(android.R.id.text1);
+			holder.triangle = view.findViewById(R.id.lisd_triangle);
 
 			view.setTag(R.layout.list_item_spinner_disciplina, holder);
 		}
 
 		int nameIndex = cursor.getColumnIndex(Disciplina.NOME),
-				symbolIndex = cursor.getColumnIndex(Disciplina.SIMBOLO),
-				colorIndex = cursor.getColumnIndex(Disciplina.COR);
+			symbolIndex = cursor.getColumnIndex(Disciplina.SIMBOLO),
+			colorIndex = cursor.getColumnIndex(Disciplina.COR);
 
 		String name = cursor.getString(nameIndex);
 		String symbol = cursor.isNull(symbolIndex) ? null : cursor.getString(symbolIndex);
 		Integer color = cursor.getInt(colorIndex);
 
 		if(isDropDown) {
+			view.setBackgroundResource(R.color.white);
+
 			holder.text1.setTextColor(context.getResources().getColor(R.color.black_87p));
-			setupColor(holder.text1, color);
 			holder.text1.setText(name + " - " + symbol);
+
+			holder.triangle.setVisibility(View.GONE);
+
+			setupColor(holder.text1, color);
 		} else {
-			holder.text1.setTextColor(context.getResources().getColor(R.color.white));
+			view.setBackgroundResource(R.color.transparent);
+
+			holder.text1.setTextColor(context.getResources().getColor(R.color.white_0_5));
 			holder.text1.setText(name);
+
+			holder.triangle.setVisibility(View.VISIBLE);
 		}
 	}
 
@@ -121,17 +133,20 @@ public class DisciplinasSpinnerCursorAdapter extends SimpleCursorAdapter {
 		int	idIndex = cursor.getColumnIndex(BaseColumns._ID),
 			nameIndex = cursor.getColumnIndex(Disciplina.NOME),
 			symbolIndex = cursor.getColumnIndex(Disciplina.SIMBOLO),
-			colorIndex = cursor.getColumnIndex(Disciplina.COR);
+			colorIndex = cursor.getColumnIndex(Disciplina.COR),
+			limiteIndex = cursor.getColumnIndex(Disciplina.LIMITE);
 
 		Long id = cursor.getLong(idIndex);
 		String name = cursor.getString(nameIndex);
 		String symbol = cursor.isNull(symbolIndex) ? null : cursor.getString(symbolIndex);
 		Integer color = cursor.isNull(colorIndex) ? null : cursor.getInt(colorIndex);
+		Integer limit = cursor.getInt(limiteIndex);
 
 		d.setId(id);
 		d.setCor(color);
 		d.setNome(name);
 		d.setSimbolo(symbol);
+		d.setLimite(limit);
 
 		return d;
 	}
@@ -146,5 +161,6 @@ public class DisciplinasSpinnerCursorAdapter extends SimpleCursorAdapter {
 
 	public static class Holder {
 		TextView text1;
+		View triangle;
 	}
 }

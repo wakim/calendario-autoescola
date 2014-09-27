@@ -18,22 +18,37 @@
 
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:background="@color/white">
 
-    <TextView
+    <br.com.wakim.autoescola.calendario.app.view.RobotoTextView
         android:id="@android:id/text1"
-        android:layout_height="@dimen/height_spinner_item"
-        android:layout_width="match_parent"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        style="@style/Material.List.TextView.Secondary"
+        android:textColor="@color/white_0_5"
+        android:text="Setembro 1, 2014"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
         android:drawablePadding="8dp"
         android:gravity="center_vertical|start"
-        android:textSize="16sp"
-        android:textColor="@color/white"
-        android:lines="1"
-        android:maxLines="1"
-        android:singleLine="true"
-        android:ellipsize="end" />
+        app:typeface="medium" />
+
+    <View
+        android:id="@+id/lisd_triangle"
+        android:layout_width="12dp"
+        android:layout_height="12dp"
+        android:background="@drawable/triangle_transparent"
+        android:layout_gravity="center_vertical|end|right"
+        android:layout_marginStart="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginTop="4dp" />
 </LinearLayout>

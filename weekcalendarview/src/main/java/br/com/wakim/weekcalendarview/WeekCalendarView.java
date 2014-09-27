@@ -290,9 +290,9 @@ public class WeekCalendarView extends View implements GestureDetector.OnGestureL
 		getGlobalVisibleRect(rect);
 
 		mDraggableManager
-				.setTop(top)
-				.setBottom(bottom)
-				.setVisibleHeight(rect.height());
+			.setTop(top)
+			.setBottom(bottom)
+			.setVisibleHeight(rect.height());
 	}
 
 	@Override

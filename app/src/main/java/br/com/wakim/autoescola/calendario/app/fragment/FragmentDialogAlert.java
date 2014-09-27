@@ -9,6 +9,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.io.Serializable;
+
 import br.com.wakim.autoescola.calendario.R;
 import br.com.wakim.autoescola.calendario.app.utils.Params;
 
@@ -18,12 +20,19 @@ import br.com.wakim.autoescola.calendario.app.utils.Params;
 public class FragmentDialogAlert extends FragmentMaterialDialog {
 
 	DialogListener mListener;
+	Serializable mParam;
 
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-
 		mListener = null;
+	}
+
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+
+		outState.putSerializable(Params.DIALOG_PARAM, mParam);
 	}
 
 	public FragmentDialogAlert() {}
@@ -58,6 +67,15 @@ public class FragmentDialogAlert extends FragmentMaterialDialog {
 	}
 
 	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+
+		if(savedInstanceState != null) {
+			mParam = savedInstanceState.getSerializable(Params.DIALOG_PARAM);
+		}
+	}
+
+	@Override
 	public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 		View view = super.onCreateView(inflater, container, savedInstanceState);
 
@@ -70,7 +88,7 @@ public class FragmentDialogAlert extends FragmentMaterialDialog {
 	@Override
 	public boolean onConfirm() {
 		if(mListener != null) {
-			mListener.onConfirm();
+			mListener.onDialogConfirm();
 		}
 
 		return true;
@@ -79,10 +97,18 @@ public class FragmentDialogAlert extends FragmentMaterialDialog {
 	@Override
 	public boolean onCancel() {
 		if(mListener != null) {
-			mListener.onCancel();
+			mListener.onDialogCancel();
 		}
 
 		return true;
+	}
+
+	public void setParameter(Serializable param) {
+		mParam = param;
+	}
+
+	public Serializable getParameter() {
+		return mParam;
 	}
 
 	@Override
@@ -95,7 +121,7 @@ public class FragmentDialogAlert extends FragmentMaterialDialog {
 	}
 
 	public static interface DialogListener {
-		public void onCancel();
-		public void onConfirm();
+		public void onDialogCancel();
+		public void onDialogConfirm();
 	}
 }

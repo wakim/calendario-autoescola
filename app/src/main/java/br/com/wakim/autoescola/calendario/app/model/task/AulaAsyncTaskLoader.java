@@ -5,15 +5,7 @@ import android.support.v4.content.AsyncTaskLoader;
 
 import com.activeandroid.Model;
 
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TimeZone;
-
 import br.com.wakim.autoescola.calendario.app.model.Aula;
-import br.com.wakim.weekcalendarview.model.Event;
-import hirondelle.date4j.DateTime;
 
 /**
  * Created by wakim on 15/06/14.

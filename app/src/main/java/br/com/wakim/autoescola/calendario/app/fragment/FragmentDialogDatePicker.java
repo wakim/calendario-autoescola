@@ -1,17 +1,11 @@
 package br.com.wakim.autoescola.calendario.app.fragment;
 
-import android.app.Dialog;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.DatePicker;
-import android.widget.TextView;
 
 import br.com.wakim.autoescola.calendario.R;
 import hirondelle.date4j.DateTime;
@@ -54,7 +48,7 @@ public class FragmentDialogDatePicker extends FragmentMaterialDialog {
 	@Override
 	public boolean onConfirm() {
 		if(mListener != null) {
-			mListener.onConfirm(new DateTime(mDatePicker.getYear(), mDatePicker.getMonth(), mDatePicker.getDayOfMonth(), 0, 0, 0, 0));
+			mListener.onDatePickerConfirm(new DateTime(mDatePicker.getYear(), mDatePicker.getMonth(), mDatePicker.getDayOfMonth(), 0, 0, 0, 0));
 		}
 
 		return true;
@@ -63,7 +57,7 @@ public class FragmentDialogDatePicker extends FragmentMaterialDialog {
 	@Override
 	public boolean onCancel() {
 		if(mListener != null) {
-			mListener.onCancel();
+			mListener.onDatePickerCancel();
 		}
 
 		return true;
@@ -75,7 +69,7 @@ public class FragmentDialogDatePicker extends FragmentMaterialDialog {
 	}
 
 	public static interface DialogListener {
-		public void onCancel();
-		public void onConfirm(DateTime date);
+		public void onDatePickerCancel();
+		public void onDatePickerConfirm(DateTime date);
 	}
 }

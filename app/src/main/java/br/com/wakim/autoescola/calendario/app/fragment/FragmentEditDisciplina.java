@@ -234,10 +234,10 @@ public class FragmentEditDisciplina extends Fragment implements View.OnClickList
 	}
 
 	@Override
-	public void onCancel() {}
+	public void onColorPickerCancel() {}
 
 	@Override
-	public void onConfirm(int cor) {
+	public void onColorPickerConfirm(int cor) {
 		mCor = cor;
 		ColorHelper.configureColor(mColor, mCor);
 	}

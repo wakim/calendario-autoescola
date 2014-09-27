@@ -11,6 +11,7 @@ import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.ListView;
 
 import com.activeandroid.content.ContentProvider;
@@ -89,6 +90,26 @@ public class FragmentSumarioAulas extends ListFragment implements LoaderManager.
 		((ViewGroup) view).addView(emptyView);
 
 		list.setEmptyView(emptyView);
+
+		list.setOnScrollListener(new AbsListView.OnScrollListener() {
+
+			@Override
+			public void onScrollStateChanged(AbsListView view, int scrollState) {}
+
+			@Override
+			public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+				View child = view.getChildAt(0);
+				int top = 0;
+
+				if(child != null) {
+					top = (firstVisibleItem) * child.getHeight() - child.getTop();
+				}
+
+				if(mDetalhesCallback != null) {
+					mDetalhesCallback.onScroll(top);
+				}
+			}
+		});
 
 		return view;
 	}
@@ -184,10 +205,10 @@ public class FragmentSumarioAulas extends ListFragment implements LoaderManager.
 	}
 
 	@Override
-	public void onCancel() {}
+	public void onDialogCancel() {}
 
 	@Override
-	public void onConfirm() {
+	public void onDialogConfirm() {
 		deleteAula();
 	}
 
